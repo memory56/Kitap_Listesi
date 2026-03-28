@@ -338,7 +338,7 @@ function saveCfg() {
 }
 
 async function initMsal() {
-  OD_CLIENT_ID = localStorage.getItem('od_clientId') || '';
+  OD_CLIENT_ID = localStorage.getItem('od_clientId') || OD_CLIENT_ID;
   OD_PHOTOS_PATH = localStorage.getItem('od_photosPath') || OD_PHOTOS_PATH;
   if (!OD_CLIENT_ID || !window.msal) return;
   try {
