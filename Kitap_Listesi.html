@@ -346,7 +346,7 @@ async function initMsal() {
       auth: {
         clientId: OD_CLIENT_ID,
         authority: 'https://login.microsoftonline.com/common',
-        redirectUri: 'http://localhost:8080'
+        redirectUri: window.location.origin + window.location.pathname
       },
       cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
     });
@@ -382,7 +382,7 @@ async function loginOneDrive() {
         auth: {
           clientId: OD_CLIENT_ID,
           authority: 'https://login.microsoftonline.com/common',
-          redirectUri: 'http://localhost:8080'
+          redirectUri: window.location.origin + window.location.pathname
         },
         cache: { cacheLocation: 'localStorage' }
       });
