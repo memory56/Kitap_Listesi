@@ -70,7 +70,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 .tb:active{border-color:#808080 #fff #fff #808080}
 #sb{background:linear-gradient(to right,#0054e3,#1a6fff);color:#fff;padding:1px 6px;font-size:11px;display:flex;align-items:center;gap:8px;min-height:18px}
 #st{flex:1}#sc{color:#afe;font-size:10px;font-weight:bold}
-.fb{padding:5px 6px 4px}
+.fb{padding:5px 6px 4px;flex:1;display:flex;flex-direction:column}
 .frame{border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#ece9d8;padding:14px 6px 6px;position:relative;margin-bottom:4px}
 .flbl{position:absolute;top:-7px;left:8px;background:#ece9d8;padding:0 3px;font-size:11px;font-weight:bold}
 .tg{display:grid;grid-template-columns:1fr 1fr 82px 138px;gap:4px;align-items:start}
@@ -99,7 +99,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 .lhdr{display:grid;grid-template-columns:36px minmax(0,1fr) 120px 100px 80px 48px 90px;background:#d4d0c8;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;border-bottom:none}
 .lh{padding:2px 4px;font-size:11px;font-weight:bold;border-right:1px solid #b0aaa0;cursor:pointer;user-select:none;white-space:nowrap;overflow:hidden}
 .lh:last-child{border-right:none}.lh:hover{background:#c0bdb5}.lh.sorted{background:#aaa8a0;color:#0054e3}
-#lb{height:calc(100vh - 580px);min-height:180px;overflow-y:auto;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#fff}
+#lb{flex:1;min-height:150px;overflow-y:auto;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#fff}
 .lr{display:grid;grid-template-columns:36px minmax(0,1fr) 120px 100px 80px 48px 90px;border-bottom:1px solid #eee;cursor:pointer;min-height:20px}
 .lr:hover:not(.sel){background:#dde8ff!important}.lr.sel{background:#0054e3!important}.lr.sel .lc{color:#fff!important}.lr.out{background:#fff5f5}
 .lc{padding:1px 4px;font-size:11px;border-right:1px solid #ebebeb;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:flex;align-items:center;line-height:1.3}
@@ -250,7 +250,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
   </div>
 
   <!-- LİSTE BAŞLIĞI -->
-  <div class="lhdr">
+  <div style="flex:1;display:flex;flex-direction:column;min-height:0;margin-top:2px"><div class="lhdr">
     <div class="lh" onclick="sortBy('id')" data-col="id">No ↕</div>
     <div class="lh" onclick="sortBy('baslik')" data-col="baslik">Başlık / Yazar ↕</div>
     <div class="lh" onclick="sortBy('yayimci')" data-col="yayimci">Yayımcı ↕</div>
@@ -302,7 +302,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
   </div>
 </div>
 </div>
-</div>
+</div></div>
 
 <script>
 const CATS=['Alternatif Tedavi','Araştırma','Astroloji','Bakım&Onarım','Belgesel','Bilim Kurgu','Dini','Dünya Dışı Temas','Eğitim','Ezoterik','Fal','Gerilim-Macera','Gıda','Gıda/Yemek','Kişisel Gelişim','Macera','Oyun','Parapsikoloji','Polisiye','Roman','Ruhsal','Ruhsal Gelişim','Sağlık','Siyasi','Spiritüalizm','Sözlük','Tarih','Tarihi Roman','UFO'];
