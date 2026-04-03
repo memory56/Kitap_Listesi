@@ -509,6 +509,7 @@ async function readFromExcel(token) {
 
     books = rows.slice(1).map(parseBook).filter(b => b.id > 0);
     nId = (books.length ? Math.max(...books.map(b=>b.id)) : 0) + 1;
+    save();
     doSearch();
     const t2 = new Date().toLocaleTimeString('tr');
     setOdStatus(`✅ ${odAccount?.name || ''} — ${books.length} kitap yüklendi (${t2})`, 'ok');
@@ -838,8 +839,8 @@ function renderList(){
       <div class="lc" title="${esc(b.baslik)} — ${esc(b.yazar)}">${(b.foto&&(photoIndex[b.foto.toLowerCase()]?.url||b.foto.startsWith('data:')))?'<span title="Fotoğraf var" style="margin-right:3px">📷</span>':''}${esc(b.baslik)}<span style="color:${sel?'#adf':'#999'};font-size:10px"> / ${esc(b.yazar)}</span></div>
       <div class="lc">${esc(b.yayimci)}</div><div class="lc">${esc(b.kategori)}</div><div class="lc">${esc(b.dil)}</div>
       <div class="lc ctr">${b.sayfa||''}</div>
-      <div class="lc ${out?'red':'grn'}" title="${out?(b.verTar?b.verTar+' tarihinde '+esc(b.verilen)+'e verildi':''):(b.verilen&&b.verilen!=='-'&&b.verilen!=='+'?'İade: '+b.iadeTar+' ('+esc(b.verilen)+')'):''}">
-        ${out?'⚑ '+esc(b.verilen):(b.verilen&&b.verilen!=='-'&&b.verilen!=='+'?'↩ İade edildi':'✓ Mevcut')}
+      <div class="lc ${out?'red':'grn'}">
+        ${out?'⚑ '+esc(b.verilen):(b.verilen&&b.verilen!=='-'&&b.verilen!=='+'?'↩ İade':'✓ Mevcut')}
       </div>
     </div>`;
   }).join('');
