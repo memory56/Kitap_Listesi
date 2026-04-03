@@ -272,6 +272,31 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
   <div class="dbd" id="dlgBd"></div>
   <div class="dbt" id="dlgBt"></div>
 </div>
+
+<!-- FOTOĞRAF SEÇİCİ MODAL -->
+<div id="photoPickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:center;justify-content:center">
+<div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:600px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column">
+  <div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px;display:flex;align-items:center;justify-content:space-between">
+    <span>🖼️ Fotoğraf Seç — OneDrive</span>
+    <button onclick="closePhotoPicker()" style="background:#d4d0c8;border:1px solid;border-color:#fff #808080 #808080 #fff;color:#000;width:17px;height:15px;font-size:9px;cursor:pointer">✕</button>
+  </div>
+  <div style="padding:6px 8px;border-bottom:1px solid #c0bdb5;display:flex;align-items:center;gap:6px">
+    <input id="photoSearch" type="text" placeholder="Ara..." oninput="filterPhotos(this.value)"
+      style="flex:1;height:22px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:11px;font-family:inherit">
+    <span id="photoCount" style="font-size:11px;color:#666"></span>
+  </div>
+  <div id="photoGrid" style="padding:8px;overflow-y:auto;flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;min-height:200px;max-height:60vh;background:#fff">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:12px">Bağlanın ve fotoğraf klasörü yüklensin...</div>
+  </div>
+  <div style="padding:6px 8px;border-top:1px solid #c0bdb5;display:flex;justify-content:space-between;align-items:center">
+    <span id="photoSelected" style="font-size:11px;color:#555;font-style:italic">Seçili: yok</span>
+    <div style="display:flex;gap:6px">
+      <button class="wb" onclick="closePhotoPicker()">İptal</button>
+      <button class="wb def" onclick="confirmPhotoSelection()">✓ Seç</button>
+    </div>
+  </div>
+</div>
+</div>
 </div>
 
 <script>
@@ -683,6 +708,98 @@ function logoutOneDrive() {
   }
 }
 
+
+// ══════════════════════════════════════════════════
+//  FOTOĞRAF SEÇİCİ
+// ══════════════════════════════════════════════════
+let selectedPhotoName = null;
+let allPhotoNames = [];
+
+function openPhotoPicker(){
+  selectedPhotoName = null;
+  document.getElementById('photoSelected').textContent = 'Seçili: yok';
+  document.getElementById('photoSearch').value = '';
+  document.getElementById('photoPickerModal').style.display = 'flex';
+  renderPhotoGrid(Object.keys(photoIndex));
+}
+
+function closePhotoPicker(){
+  document.getElementById('photoPickerModal').style.display = 'none';
+  selectedPhotoName = null;
+}
+
+function renderPhotoGrid(names){
+  const grid = document.getElementById('photoGrid');
+  document.getElementById('photoCount').textContent = names.length + ' fotoğraf';
+  if(!names.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#888;font-size:12px">Sonuç bulunamadı</div>';
+    return;
+  }
+  grid.innerHTML = names.map(name => `
+    <div onclick="selectPhoto('${name}')" id="pg_${name.replace(/[^a-z0-9]/gi,'_')}"
+      style="border:2px solid #c0bdb5;cursor:pointer;background:#f5f5f5;display:flex;flex-direction:column;align-items:center;padding:4px;border-radius:4px;min-height:120px">
+      <div class="pg-img" data-name="${name}"
+        style="width:90px;height:90px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#e0e0e0;flex-shrink:0">
+        <span style="font-size:24px">📷</span>
+      </div>
+      <div style="font-size:9px;color:#555;margin-top:3px;text-align:center;word-break:break-all;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${name}">${name}</div>
+    </div>
+  `).join('');
+  // Lazy load thumbnails
+  loadVisibleThumbnails(names);
+}
+
+async function loadVisibleThumbnails(names){
+  // Load first 20 thumbnails
+  const batch = names.slice(0, 20);
+  for(const name of batch){
+    const entry = photoIndex[name];
+    if(!entry || !entry.id) continue;
+    try {
+      const token = await getToken();
+      const res = await fetch(
+        `${GRAPH}/me/drive/items/${entry.id}/thumbnails/0/small/content`,
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      if(!res.ok) continue;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const key = name.replace(/[^a-z0-9]/gi,'_');
+      const el = document.querySelector(`#pg_${key} .pg-img`);
+      if(el) el.innerHTML = `<img src="${url}" style="width:90px;height:90px;object-fit:cover">`;
+    } catch(e){}
+  }
+}
+
+function filterPhotos(q){
+  const names = Object.keys(photoIndex).filter(n => n.toLowerCase().includes(q.toLowerCase()));
+  renderPhotoGrid(names);
+}
+
+function selectPhoto(name){
+  selectedPhotoName = name;
+  // Highlight selected
+  document.querySelectorAll('#photoGrid > div').forEach(el => {
+    el.style.borderColor = '#c0bdb5';
+    el.style.background = '#f5f5f5';
+  });
+  const key = name.replace(/[^a-z0-9]/gi,'_');
+  const el = document.getElementById('pg_' + key);
+  if(el){ el.style.borderColor = '#0054e3'; el.style.background = '#dde8ff'; }
+  document.getElementById('photoSelected').textContent = 'Seçili: ' + name;
+}
+
+async function confirmPhotoSelection(){
+  if(!selectedPhotoName){ closePhotoPicker(); return; }
+  closePhotoPicker();
+  // Show in form
+  tmpFoto = selectedPhotoName;  // store filename, not base64
+  showFoto(selectedPhotoName);
+  const phtxt = document.getElementById('phtxt');
+  if(phtxt) phtxt.textContent = '📁 ' + selectedPhotoName;
+  setStatus('Fotoğraf seçildi: ' + selectedPhotoName + ' — Güncelle ile kaydedin.');
+}
+
 function init(){
   CATS.forEach(c=>{['fKategori','sCat'].forEach(id=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById(id).appendChild(o);});});
   doSearch();
@@ -797,7 +914,13 @@ function btnTemizle(){
   document.getElementById('fKategori').value='';document.getElementById('fDil').value='';
   showFoto('');renderList();setStatus('Form temizlendi.');document.getElementById('fBaslik').focus();
 }
-function btnFoto(){document.getElementById('pinput').click();}
+function btnFoto(){
+  if(odConnected && Object.keys(photoIndex).length > 0){
+    openPhotoPicker();
+  } else {
+    document.getElementById('pinput').click();
+  }
+}
 function updatePhotoHint(filename){
   const el=document.getElementById('phtxt');
   if(el && filename) el.textContent='📁 '+filename;
