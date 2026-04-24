@@ -650,6 +650,7 @@ async function getNextRow(token) {
 // ── ONEDRIVE FOTOĞRAF İNDEKSİ ──────────────────────────────────
 let photoIndex = {};   // { "kapak.jpg": "https://...downloadUrl..." }
 let photosParentId = null;  // photos/ klasörünün parent item ID'si
+let photosFolderIdGlobal = null; // Fotoğraf klasörü ID (upload için)
 
 async function loadPhotoIndex(token) {
   try {
@@ -709,6 +710,7 @@ async function loadPhotoIndex(token) {
 
     // ── Klasördeki tüm dosyaları listele (sayfalama dahil) ──────────
     photoIndex = {};
+    photosFolderIdGlobal = photosFolderId;
     let url = `${GRAPH}/me/drive/items/${photosFolderId}/children?$select=name,file,id&$top=999`;
 
     while (url) {
@@ -983,8 +985,45 @@ function updatePhotoHint(filename){
 }
 function onFotoSel(inp){
   if(!inp.files||!inp.files[0])return;
-  const r=new FileReader();r.onload=e=>{tmpFoto=e.target.result;showFoto(tmpFoto);setStatus('Fotoğraf seçildi — Ekle/Güncelle ile kaydedin.');};
-  r.readAsDataURL(inp.files[0]);
+  const file = inp.files[0];
+  if(odConnected && photosFolderIdGlobal){
+    const r = new FileReader();
+    r.onload = async function(e){
+      tmpFoto = e.target.result;
+      showFoto(tmpFoto);
+      setStatus('📤 OneDrive\'a yükleniyor: ' + file.name + '...');
+      try {
+        const uploadedName = await uploadPhotoToOneDrive(file);
+        tmpFoto = uploadedName;
+        showFoto(uploadedName);
+        setStatus('✅ OneDrive\'a yüklendi: ' + uploadedName + ' — Ekle/Güncelle ile kaydedin.');
+      } catch(err) {
+        setStatus('⚠️ OneDrive yüklenemedi (' + (err.message||err) + ') — Yerel resim kullanılıyor.');
+      }
+    };
+    r.readAsDataURL(file);
+  } else {
+    const r = new FileReader();
+    r.onload = e => { tmpFoto = e.target.result; showFoto(tmpFoto); setStatus('Fotoğraf seçildi — Ekle/Güncelle ile kaydedin.'); };
+    r.readAsDataURL(file);
+  }
+}
+async function uploadPhotoToOneDrive(file){
+  const token = await getToken();
+  const safeName = file.name.replace(/[^a-zA-Z0-9._\u00C0-\u024F-]/g, '_');
+  const uploadUrl = GRAPH + '/me/drive/items/' + photosFolderIdGlobal + ':/' + encodeURIComponent(safeName) + ':/content';
+  const res = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': file.type || 'application/octet-stream' },
+    body: file
+  });
+  if(!res.ok){
+    const err = await res.json().catch(function(){return {};});
+    throw new Error(err.error && err.error.message ? err.error.message : 'HTTP ' + res.status);
+  }
+  const data = await res.json();
+  photoIndex[safeName.toLowerCase()] = { id: data.id };
+  return safeName;
 }
 function btnFotoSil(){
   tmpFoto='';showFoto('');
