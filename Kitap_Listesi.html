@@ -1044,7 +1044,7 @@ function renderList(){
     return`<div class="lr${sel?' sel':''}${out?' out':(b.verilen&&b.verilen!=='-'&&b.iadeTar?' iaded':'')}" onclick="selRow(${b.id})">
       <div class="lc ctr">${b.id}</div>
       <div class="lc" title="${esc(b.baslik)} — ${esc(b.yazar)}">${(b.foto&&(photoIndex[b.foto.toLowerCase()]?.url||b.foto.startsWith('data:')))?'<span title="Fotoğraf var" style="margin-right:3px">📷</span>':''}${esc(b.baslik)}<span style="color:${sel?'#adf':'#999'};font-size:10px"> / ${esc(b.yazar)}</span></div>
-      <div class="lc">${esc(b.yayimci)}</div><div class="lc" title="${esc(b.kategori)">${esc(b.kategori)</div><div class="lc">${esc(b.dil)}</div>
+      <div class="lc">${esc(b.yayimci)}</div><div class="lc" title="${esc(b.kategori)}">${esc(b.kategori)}</div><div class="lc">${esc(b.dil)}</div>
       <div class="lc ctr">${b.sayfa||''}</div>
       <div class="lc ${out?'red':'grn'}">
         ${out?'⚑ '+esc(b.verilen):(b.verilen&&b.verilen!=='-'&&b.verilen!=='+'?'↩ İade':'✓ Mevcut')}
