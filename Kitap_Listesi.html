@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.6</title>
+<title>Kitap Yönetim Sistemi v4.7</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -62,8 +62,8 @@
 </style>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;color:#000;min-height:100vh;display:flex;flex-direction:column;align-items:stretch;padding:0;margin:0}
-#win{background:#ece9d8;width:100%;min-height:100vh;display:flex;flex-direction:column}
+body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;color:#000;height:100dvh;overflow:hidden;display:flex;flex-direction:column;align-items:stretch;padding:0;margin:0}
+#win{background:#ece9d8;width:100%;height:100%;display:flex;flex-direction:column}
 .tbar{background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:3px 6px;display:flex;align-items:center;justify-content:space-between;height:22px}
 .tbar-l{display:flex;align-items:center;gap:5px;font-weight:bold;font-size:12px}
 .tbar-b{display:flex;gap:2px}
@@ -101,10 +101,10 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 .sr input,.sr select{height:20px;background:#fff;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 3px;font-size:11px;font-family:inherit;outline:none}
 .sr input:focus,.sr select:focus{outline:2px solid #0054e3;outline-offset:-1px}
 .slbl{background:#0054e3;color:#fff;padding:1px 7px;font-size:11px;font-weight:bold;border:1px solid;border-color:#fff #004ab8 #004ab8 #fff}
-.lhdr{display:grid;grid-template-columns:36px minmax(0,1fr) 120px 100px 80px 48px 90px;background:#d4d0c8;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;border-bottom:none}
+.lhdr{display:grid;grid-template-columns:36px minmax(0,1fr) 120px 100px 80px 48px 90px;scrollbar-gutter:stable;background:#d4d0c8;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;border-bottom:none}
 .lh{padding:2px 4px;font-size:11px;font-weight:bold;border-right:1px solid #b0aaa0;cursor:pointer;user-select:none;white-space:nowrap;overflow:hidden}
 .lh:last-child{border-right:none}.lh:hover{background:#c0bdb5}.lh.sorted{background:#aaa8a0;color:#0054e3}
-#lb{height:320px;overflow-y:auto;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#fff}
+#lb{flex:1;min-height:0;overflow-y:auto;scrollbar-gutter:stable;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#fff}
 .lr{display:grid;grid-template-columns:36px minmax(0,1fr) 120px 100px 80px 48px 90px;border-bottom:1px solid #eee;cursor:pointer;min-height:20px}
 .lr:hover:not(.sel){background:#dde8ff!important}.lr.sel{background:#0054e3!important}.lr.sel .lc{color:#fff!important}.lr.out{background:#fff5f5}.lr.iaded{background:#f0fff0}
 .lc{padding:1px 4px;font-size:11px;border-right:1px solid #ebebeb;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:flex;align-items:center;line-height:1.3}
@@ -1044,7 +1044,7 @@ function renderList(){
     return`<div class="lr${sel?' sel':''}${out?' out':(b.verilen&&b.verilen!=='-'&&b.iadeTar?' iaded':'')}" onclick="selRow(${b.id})">
       <div class="lc ctr">${b.id}</div>
       <div class="lc" title="${esc(b.baslik)} — ${esc(b.yazar)}">${(b.foto&&(photoIndex[b.foto.toLowerCase()]?.url||b.foto.startsWith('data:')))?'<span title="Fotoğraf var" style="margin-right:3px">📷</span>':''}${esc(b.baslik)}<span style="color:${sel?'#adf':'#999'};font-size:10px"> / ${esc(b.yazar)}</span></div>
-      <div class="lc">${esc(b.yayimci)}</div><div class="lc" title="${esc(b.kategori)}${b.altKategori?' > '+esc(b.altKategori):''}">${esc(b.kategori)}${b.altKategori?('<span style="color:'+(sel?'#adf':'#aaa')+';font-size:9px"> ›'+esc(b.altKategori)+'</span>'):''}</div><div class="lc">${esc(b.dil)}</div>
+      <div class="lc">${esc(b.yayimci)}</div><div class="lc" title="${esc(b.kategori)">${esc(b.kategori)</div><div class="lc">${esc(b.dil)}</div>
       <div class="lc ctr">${b.sayfa||''}</div>
       <div class="lc ${out?'red':'grn'}">
         ${out?'⚑ '+esc(b.verilen):(b.verilen&&b.verilen!=='-'&&b.verilen!=='+'?'↩ İade':'✓ Mevcut')}
