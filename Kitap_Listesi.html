@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.8.1</title>
+<title>Kitap Yönetim Sistemi v4.8.2</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -1222,9 +1222,9 @@ async function showFoto(src){
 
   if(entry && entry.id && odConnected){
     if(photoCache.has(fname)){
-      const cached=photoCache.get(fname);
-      if(img.src && img.src.startsWith('blob:') && img.src!==cached) URL.revokeObjectURL(img.src);
-      img.src=cached; show(); return;
+      if(img.src && img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+      img.src=URL.createObjectURL(photoCache.get(fname));
+      show(); return;
     }
     try {
       const token = await getToken();
@@ -1237,7 +1237,7 @@ async function showFoto(src){
       // Eski blob URL'yi temizle
       if(img.src && img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
       img.src = URL.createObjectURL(blob);
-      photoCache.set(fname, img.src);
+      photoCache.set(fname, blob);
       show();  // blob hazır, direkt göster — onload bekleme
     } catch(e) {
       console.warn('Fotoğraf yüklenemedi:', fname, e);
