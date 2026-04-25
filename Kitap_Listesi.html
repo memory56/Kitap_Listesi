@@ -339,7 +339,7 @@ function normalizeDateStr(s){
   if(m3) return ('0'+m3[1]).slice(-2)+'.'+('0'+m3[2]).slice(-2)+'.'+m3[3];
   // GG.YYYY (ay yok)
   var m4=/^(\d{1,2})[\.\-\/](\d{4})$/.exec(s);
-  if(m4) return ('0'+m4[1]).slice(-2)+'.01.'+m4[2];
+  if(m4) return ('0'+m4[1]).slice(-2)+'.'+m4[2];
   // Sadece yıl YYYY
   if(/^\d{4}$/.test(s)) return s;
   // YYYY-MM-DD (ISO)
