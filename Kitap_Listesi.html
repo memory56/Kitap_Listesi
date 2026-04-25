@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.8</title>
+<title>Kitap Yönetim Sistemi v4.8.1</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -72,7 +72,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 #sb{background:linear-gradient(to right,#0054e3,#1a6fff);color:#fff;padding:1px 6px;font-size:11px;display:flex;align-items:center;gap:8px;min-height:18px}
 #st{flex:1}#sc{color:#afe;font-size:10px;font-weight:bold}
 .fb{padding:5px 6px 4px;flex:1;min-height:0;display:flex;flex-direction:column}
-.frame{border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#ece9d8;padding:14px 6px 6px;position:relative;margin-bottom:4px}
+.frame{border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;background:#ece9d8;padding:14px 6px 6px;position:relative;margin-bottom:4px}.frame.foto-loading{opacity:0.5;transition:opacity 0.2s}
 .flbl{position:absolute;top:-7px;left:8px;background:#ece9d8;padding:0 3px;font-size:11px;font-weight:bold}
 .tg{display:grid;grid-template-columns:1fr 1fr 82px 138px;gap:4px;align-items:start}
 .fc{display:flex;flex-direction:column;gap:2px}
@@ -1071,6 +1071,7 @@ function fillForm(b){
  document.getElementById('fAltKategori').value=b.altKategori||'';
  document.getElementById('fDil').value=b.dil||'';
  tmpFoto=null;
+ document.querySelector('.frame').classList.add('foto-loading');
  showFoto(b.foto||'').catch(()=>{});
  const phtxt=document.getElementById('phtxt');
  if(phtxt && b.foto && !b.foto.startsWith('data:')) phtxt.textContent='📁 '+b.foto.split('/').pop().split('\\').pop();
@@ -1202,10 +1203,12 @@ async function showFoto(src){
   const hide = () => {
     img.style.display = 'none';
     els.forEach(e => e.style.display = '');
+    const fr=document.querySelector('.frame');if(fr)fr.classList.remove('foto-loading');
   };
   const show = () => {
     img.style.display = 'block';
     els.forEach(e => e.style.display = 'none');
+    const fr=document.querySelector('.frame');if(fr)fr.classList.remove('foto-loading');
   };
 
   if(!src){ hide(); return; }
@@ -1219,8 +1222,9 @@ async function showFoto(src){
 
   if(entry && entry.id && odConnected){
     if(photoCache.has(fname)){
-      if(img.src && img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
-      img.src = photoCache.get(fname); show(); return;
+      const cached=photoCache.get(fname);
+      if(img.src && img.src.startsWith('blob:') && img.src!==cached) URL.revokeObjectURL(img.src);
+      img.src=cached; show(); return;
     }
     try {
       const token = await getToken();
