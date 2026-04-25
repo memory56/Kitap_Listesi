@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.5</title>
+<title>Kitap Yönetim Sistemi v4.6</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -192,10 +192,10 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
       <!-- SOL ALANLAR -->
       <div class="fc">
         <div class="fr"><label>ID:</label><input id="fID" readonly style="max-width:50px"></div>
-        <div class="fr"><label>Başlık:</label><input id="fBaslik"></div>
-        <div class="fr"><label>Yazar:</label><input id="fYazar"></div>
-        <div class="fr"><label>Yayımcı:</label><input id="fYayimci"></div>
-        <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri"></div>
+        <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this)"></div>
+        <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this)" list="dl-yazar"></div>
+        <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this)" list="dl-yayimci"></div>
+        <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri" oninput="titleCaseInput(this)" list="dl-yayimyeri"></div>
         <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
         <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
         <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px"></div>
@@ -205,7 +205,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect()"><option value=""></option></select><select id="fAltKategori" title="Alt Kategori"><option value=""></option></select></div>
         <div class="fr"><label>Dil:</label>
           <select id="fDil"><option value=""></option></select></div>
-        <div class="fr"><label>Çevirmen:</label><input id="fCevirmen"></div>
+        <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this)" list="dl-cevirmen"></div>
         <div class="fr"><label>Sayfa Sayısı:</label><input id="fSayfa" type="number" min="0" style="max-width:65px"></div>
         <div class="fr"><label>Kayıt Tar.:</label><input id="fKayitTar" readonly></div>
         <div class="fr"><label>Güncelleme:</label><input id="fGuncelTar" readonly></div>
@@ -229,7 +229,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
       <!-- FOTOĞRAF -->
       <div class="pw">
         <div id="pbox" onclick="btnFoto()" title="Fotoğraf yüklemek için tıklayın (photos/ klasöründen otomatik yüklenir)">
-          <img id="pimg" src="" alt="Kapak">
+          <img id="pimg" src="" alt="Kapak" loading="lazy" style="transition:opacity 0.3s">
           <div class="phi">📷</div>
           <div id="phtxt">Fotoğraf Yok</div>
         </div>
@@ -276,7 +276,8 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 </div>
 
   <!-- LİSTE DÜZENLEYİCİ MODAL -->
-  <div id="listEditorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:600;align-items:center;justify-content:center"><div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:700px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column"><div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px;display:flex;align-items:center;justify-content:space-between"><span>&#128203; Liste Duzenleyici</span><button onclick="closeListEditor()" style="background:#d4d0c8;border:1px solid;border-color:#fff #808080 #808080 #fff;color:#000;width:17px;height:15px;font-size:9px;cursor:pointer">&#x2715;</button></div><div style="display:flex;gap:0;flex:1;overflow:hidden"><div style="flex:1;padding:10px;border-right:1px solid #c0bdb5;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:bold;color:#333;margin-bottom:2px">Ana Kategoriler</div><textarea id="leKategori" style="flex:1;min-height:240px;resize:none;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:4px;font-size:11px;font-family:inherit;background:#fff" spellcheck="false"></textarea></div><div style="flex:1;padding:10px;border-right:1px solid #c0bdb5;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:bold;color:#333;margin-bottom:2px">Alt Kategoriler (ÜstKat &gt; AltKat)</div><textarea id="leAltKategori" style="flex:1;min-height:240px;resize:none;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:4px;font-size:11px;font-family:inherit;background:#fff" spellcheck="false" placeholder="Roman > Tarihi&#10;Bilim > Fizik"></textarea></div><div style="flex:1;padding:10px;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:bold;color:#333;margin-bottom:2px">Diller</div><textarea id="leDil" style="flex:1;min-height:240px;resize:none;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:4px;font-size:11px;font-family:inherit;background:#fff" spellcheck="false"></textarea></div></div><div style="padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #c0bdb5"><button class="wb" onclick="resetListsToDefault()" style="color:#800000;font-size:10px">Varsayilana Don</button><div style="display:flex;gap:6px"><button class="wb" onclick="closeListEditor()">Iptal</button><button class="wb def" onclick="saveListEditor()">&#128190; Kaydet</button></div></div></div></div>
+  <div id="listEditorModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:600;align-items:center;justify-content:center"><div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:700px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column"><div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px;display:flex;align-items:center;justify-content:space-between"><span>&#128203; Liste Duzenleyici</span><button onclick="closeListEditor()" style="background:#d4d0c8;border:1px solid;border-color:#fff #808080 #808080 #fff;color:#000;width:17px;height:15px;font-size:9px;cursor:pointer">&#x2715;</button></div><div style="display:flex;gap:0;flex:1;overflow:hidden"><div style="flex:1;padding:10px;border-right:1px solid #c0bdb5;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:bold;color:#333;margin-bottom:2px">Ana Kategoriler</div><textarea id="leKategori" style="flex:1;min-height:240px;resize:none;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:4px;font-size:11px;font-family:inherit;background:#fff" spellcheck="false"></textarea></div><div style="flex:1;padding:10px;border-right:1px solid #c0bdb5;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:bold;color:#333;margin-bottom:2px">Alt Kategoriler (ÜstKat &gt; AltKat)</div><textarea id="leAltKategori" style="flex:1;min-height:240px;resize:none;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:4px;font-size:11px;font-family:inherit;background:#fff" spellcheck="false" placeholder="Roman > Tarihi&#10;Bilim > Fizik"></textarea>
+<button type="button" onclick="openAddAltKatDialog()" style="margin-top:4px;font-size:11px;background:#e8f4f8;border:1px solid #aaa;border-radius:3px;padding:3px 8px;cursor:pointer;">+ Alt Kategori Ekle</button></div><div style="flex:1;padding:10px;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;font-weight:bold;color:#333;margin-bottom:2px">Diller</div><textarea id="leDil" style="flex:1;min-height:240px;resize:none;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:4px;font-size:11px;font-family:inherit;background:#fff" spellcheck="false"></textarea></div></div><div style="padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #c0bdb5"><button class="wb" onclick="resetListsToDefault()" style="color:#800000;font-size:10px">Varsayilana Don</button><div style="display:flex;gap:6px"><button class="wb" onclick="closeListEditor()">Iptal</button><button class="wb def" onclick="saveListEditor()">&#128190; Kaydet</button></div></div></div></div>
   <!-- DİYALOG -->
 <div id="dlgOv">
 <div id="dlgBox">
@@ -321,7 +322,7 @@ const RAW=[[1,'MS 2150','Thea Alexander','AKAŞA','TÜRKİYE','975-6793-21','200
 
 let books=RAW.map(r=>({id:r[0],baslik:r[1]||'',yazar:r[2]||'',yayimci:r[3]||'',yayimYeri:r[4]||'',isbn:r[5]||'',basimTarihi:r[6]||'',baski:r[7]!=null?String(r[7]):'',kategori:r[8]||'',altKategori:r[18]||'',dil:r[9]||'',cevirmen:r[10]||'',sayfa:r[11],kayitTar:r[12]||'',guncelTar:r[13]||'',verilen:r[14]||'',verTar:r[15]||'',iadeTar:r[16]||'',foto:''}));
 (()=>{try{const s=JSON.parse(localStorage.getItem('kys4')||'null');if(s&&s.length)books=s;}catch(e){}})();
-let filtered=[],selId=null,sCol='id',sDir=1,nId=Math.max(...books.map(b=>b.id))+1,tmpFoto=null;
+let filtered=[],selId=null,sCol='id',sDir=1,nId=Math.max((parseInt(localStorage.getItem('kys4_lastId')||'0')||0),Math.max(0,...books.map(b=>b.id)))+1,tmpFoto=null;
 const save=()=>{try{localStorage.setItem('kys4',JSON.stringify(books));}catch(e){}};
 const today=()=>{const d=new Date();return`${('0'+d.getDate()).slice(-2)}.${('0'+(d.getMonth()+1)).slice(-2)}.${d.getFullYear()}`};
 // ── TARİH FORMAT YARDIMCISI ──────────────────────────────────
@@ -345,6 +346,9 @@ function normalizeDateStr(s){
   var m5=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
   if(m5) return m5[3]+'.'+m5[2]+'.'+m5[1];
   // Olduğu gibi bırak
+  // AA.YY veya AA.YYYY (ay.yil formati)
+  var mAY=/^(\d{1,2})\.(\d{2}|\d{4})$/.exec(s);
+  if(mAY){var mon=('0'+mAY[1]).slice(-2);var yr=mAY[2].length===2?'20'+mAY[2]:mAY[2];return mon+'.'+yr;}
   return s;
 }
 function formatDateField(inp){
@@ -356,6 +360,14 @@ const setStatus=m=>document.getElementById('st').textContent=m;
 
 // ── ÇEVRIMDIŞI İŞLEM KUYRUĞU ─────────────────────────────────
 let pendingQueue=(function(){try{const s=localStorage.getItem('kys4_pending');return s?JSON.parse(s):[];}catch(e){return [];}})();
+function titleCaseInput(el){
+  var start=el.selectionStart,end=el.selectionEnd;
+  var v=el.value.replace(/(^|\s)([a-zçğıöşü])/g,function(m,p1,p2){
+    var upper={'ı':'I','ç':'Ç','ğ':'Ğ','ö':'Ö','ş':'Ş','ü':'Ü'};
+    return p1+(upper[p2]||p2.toUpperCase());
+  }).replace(/(^|\s)i/g,function(m,p1){return p1+'İ';});
+  if(el.value!==v){el.value=v;try{el.setSelectionRange(start,end);}catch(e){}}
+}
 function savePendingQueue(){try{localStorage.setItem('kys4_pending',JSON.stringify(pendingQueue));}catch(e){}}
 function addPending(op){pendingQueue.push(op);savePendingQueue();}
 function showPendingInfo(){
@@ -994,7 +1006,37 @@ function doSearch(){
 const clearSearch=()=>{['sQ','sCat','sLang','sSt'].forEach(id=>document.getElementById(id).value='');doSearch();};
 function sortBy(col){if(sCol===col)sDir*=-1;else{sCol=col;sDir=1;}document.querySelectorAll('.lh').forEach(c=>{c.classList.remove('sorted');if(c.dataset.col===col)c.classList.add('sorted');});doSearch();}
 
+function updateDataLists(){
+  const yazar=new Set(),yayimci=new Set(),yayimyeri=new Set(),cevirmen=new Set();
+  books.forEach(b=>{
+    if(b.yazar)b.yazar.split(/[,;]/).forEach(v=>{const t=v.trim();if(t)yazar.add(t);});
+    if(b.yayimci)yayimci.add(b.yayimci.trim());
+    if(b.yayimYeri)yayimyeri.add(b.yayimYeri.trim());
+    if(b.cevirmen)b.cevirmen.split(/[,;]/).forEach(v=>{const t=v.trim();if(t)cevirmen.add(t);});
+  });
+  const fill=(id,set)=>{const dl=document.getElementById(id);if(!dl)return;dl.innerHTML=[...set].sort().map(v=>'<option value="'+v.replace(/"/g,'&quot;')+'">').join('');};
+  fill('dl-yazar',yazar);fill('dl-yayimci',yayimci);fill('dl-yayimyeri',yayimyeri);fill('dl-cevirmen',cevirmen);
+}
+function openAddAltKatDialog(){
+  const dlg=document.getElementById('addAltKatDlg');
+  const sel=document.getElementById('dlgAnaKat');
+  sel.innerHTML='<option value="">-- Seçiniz --</option>'+CATS.map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+  document.getElementById('dlgAltKatAdi').value='';
+  dlg.showModal();
+  setTimeout(()=>document.getElementById('dlgAltKatAdi').focus(),50);
+}
+function confirmAddAltKat(){
+  const anaKat=document.getElementById('dlgAnaKat').value.trim();
+  const altKat=document.getElementById('dlgAltKatAdi').value.trim();
+  if(!anaKat){alert('Lütfen ana kategori seçiniz!');return;}
+  if(!altKat){alert('Lütfen alt kategori adı giriniz!');return;}
+  const ta=document.getElementById('leAltKategori');
+  const cur=ta.value.trim();
+  ta.value=cur?cur+'\n'+anaKat+' > '+altKat:anaKat+' > '+altKat;
+  document.getElementById('addAltKatDlg').close();
+}
 function renderList(){
+  updateDataLists();
   const lb=document.getElementById('lb');
   if(!filtered.length){lb.innerHTML='<div style="padding:30px;text-align:center;color:#888;font-size:13px">⚠️ Sonuç bulunamadı</div>';}
   else lb.innerHTML=filtered.map(b=>{
@@ -1050,9 +1092,9 @@ function readForm(){
 function btnEkle(){
  const d=readForm();
  if(!d.baslik){showMsg('Uyarı','⚠️ Başlık alanı boş bırakılamaz!');return;}
- if(!d.isbn){showMsg('Uyarı','⚠️ ISBN alanı boş bırakılamaz!');return;}
+ if(!d.isbn){setStatus('⚠️ ISBN boş bırakıldı.');}
  if(d.isbn&&d.isbn!=='—'&&books.some(b=>b.isbn===d.isbn)){showMsg('Mükerrer ISBN','⚠️ Bu ISBN ('+d.isbn+') zaten kayıtlı!');return;}
- d.id=nId++;d.kayitTar=today();d.guncelTar=today();
+ d.id=nId++;localStorage.setItem('kys4_lastId',nId);d.kayitTar=today();d.guncelTar=today();
  books.push(d);save();doSearch();
  if(odConnected){excelSyncAdd(d);}else{addPending({type:'add',book:d});showPendingInfo();}
  setStatus('✅ Kitap başarıyla eklendi! ID: '+d.id);
@@ -1090,7 +1132,7 @@ function btnTemizle(){
  document.getElementById('fKategori').value='';
  document.getElementById('fAltKategori').value='';
  document.getElementById('fDil').value='';
- showFoto('');renderList();setStatus('Form temizlendi.');document.getElementById('fBaslik').focus();
+ document.getElementById('pinput').value='';showFoto('');renderList();setStatus('Form temizlendi.');document.getElementById('fBaslik').focus();
 }
 function btnFoto(){
   if(odConnected && Object.keys(photoIndex).length > 0){
@@ -1219,6 +1261,32 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeDlg();
 });
 init();
+</script>
+<datalist id="dl-yazar"></datalist>
+<datalist id="dl-yayimci"></datalist>
+<datalist id="dl-yayimyeri"></datalist>
+<datalist id="dl-cevirmen"></datalist>
+<dialog id="addAltKatDlg" style="border-radius:8px;border:2px solid #005ea2;min-width:300px;padding:16px;font-size:13px;">
+  <div style="font-weight:bold;margin-bottom:10px;color:#005ea2;">Alt Kategori Ekle</div>
+  <div style="margin-bottom:8px;">
+    <label style="display:block;font-size:11px;color:#555;margin-bottom:3px;">Ana Kategori:</label>
+    <select id="dlgAnaKat" style="width:100%;padding:4px;font-size:13px;border:1px solid #aaa;border-radius:3px;"><option value="">-- Seçiniz --</option></select>
+  </div>
+  <div style="margin-bottom:12px;">
+    <label style="display:block;font-size:11px;color:#555;margin-bottom:3px;">Alt Kategori Adı:</label>
+    <input id="dlgAltKatAdi" type="text" oninput="titleCaseInput(this)" style="width:100%;padding:4px;font-size:13px;border:1px solid #aaa;border-radius:3px;box-sizing:border-box;" placeholder="Alt kategori adını yazınız">
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;">
+    <button type="button" onclick="document.getElementById('addAltKatDlg').close()" style="padding:4px 12px;background:#eee;border:1px solid #aaa;border-radius:3px;cursor:pointer;">İptal</button>
+    <button type="button" onclick="confirmAddAltKat()" style="padding:4px 12px;background:#005ea2;color:white;border:none;border-radius:3px;cursor:pointer;">Ekle</button>
+  </div>
+</dialog>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(err=>console.log('SW:'+(err.message||err)));
+  });
+}
 </script>
 </body>
 </html>
