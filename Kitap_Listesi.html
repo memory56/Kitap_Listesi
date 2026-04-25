@@ -911,7 +911,7 @@ async function confirmPhotoSelection(){
 
 
 function triggerFileInput(){var inp=document.getElementById('pinput');inp.style.cssText='display:block;position:fixed;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px';inp.click();setTimeout(function(){inp.style.cssText='display:none';},1000);}
-function showPhotoMenu(){var pbox=document.getElementById('pbox');var rect=pbox.getBoundingClientRect();var existing=document.getElementById('photoMenu');if(existing){existing.remove();return;}var menu=document.createElement('div');menu.id='photoMenu';menu.style.cssText='position:fixed;left:'+rect.left+'px;top:'+(rect.bottom+2)+'px;background:#ece9d8;border:1px solid;border-color:#fff #808080 #808080 #fff;box-shadow:3px 3px 6px rgba(0,0,0,.3);z-index:999;min-width:190px';var item1=document.createElement('div');item1.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer;border-bottom:1px solid #c0bdb5';item1.textContent='\uD83D\uDDBC\uFE0F OneDrive\'dan Se\u00E7';item1.onmouseover=function(){this.style.background='#dde8ff';};item1.onmouseout=function(){this.style.background='';};item1.onclick=function(){openPhotoPicker();menu.remove();};var item2=document.createElement('div');item2.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer';item2.textContent='\uD83D\uDCBB Bilgisayardan Y\u00FCkle';item2.onmouseover=function(){this.style.background='#dde8ff';};item2.onmouseout=function(){this.style.background='';};item2.onclick=function(){triggerFileInput();menu.remove();};menu.appendChild(item1);menu.appendChild(item2);document.body.appendChild(menu);setTimeout(function(){document.addEventListener('click',function handler(e){if(!menu.contains(e.target)&&e.target!==pbox){menu.remove();document.removeEventListener('click',handler);}});},100);}
+function showPhotoMenu(){var pbox=document.getElementById('pbox');var rect=pbox.getBoundingClientRect();var existing=document.getElementById('photoMenu');if(existing){existing.remove();return;}var menu=document.createElement('div');menu.id='photoMenu';menu.style.cssText='position:fixed;left:'+rect.left+'px;top:'+(rect.bottom+2)+'px;background:#ece9d8;border:1px solid;border-color:#fff #808080 #808080 #fff;box-shadow:3px 3px 6px rgba(0,0,0,.3);z-index:999;min-width:190px';var item1=document.createElement('div');item1.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer;border-bottom:1px solid #c0bdb5';item1.textContent='🖼\uFE0F OneDrive\'dan Se\u00E7';item1.onmouseover=function(){this.style.background='#dde8ff';};item1.onmouseout=function(){this.style.background='';};item1.onclick=function(){openPhotoPicker();menu.remove();};var item2=document.createElement('div');item2.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer';item2.textContent='💻 Bilgisayardan Y\u00FCkle';item2.onmouseover=function(){this.style.background='#dde8ff';};item2.onmouseout=function(){this.style.background='';};item2.onclick=function(){triggerFileInput();menu.remove();};menu.appendChild(item1);menu.appendChild(item2);document.body.appendChild(menu);setTimeout(function(){document.addEventListener('click',function handler(e){if(!menu.contains(e.target)&&e.target!==pbox){menu.remove();document.removeEventListener('click',handler);}});},100);}
 function openListEditor(){
 document.getElementById('leKategori').value=CATS.join('\n');
 document.getElementById('leDil').value=LANGS.join('\n');
@@ -935,7 +935,7 @@ rebuildSelects();closeListEditor();setStatus('Listeler guncellendi: '+CATS.lengt
 }
 function resetListsToDefault(){
 if(!confirm('Varsayilana donduruluyor...'))return;
-CATS.length=0;(function(){try{var s=localStorage.getItem('kys4_cats');return s?JSON.parse(s):[];}catch(e){return [];}})();
+CATS.length=0;
 ['Alternatif Tedavi','Araştırma','Astroloji','Bakım&Onarım','Belgesel','Bilim Kurgu','Dini','Dünya Dışı Temas','Eğitim','Ezoterik','Fal','Gerilim-Macera','Gıda','Gıda/Yemek','Kişisel Gelişim','Macera','Oyun','Parapsikoloji','Polisiye','Roman','Ruhsal','Ruhsal Gelişim','Sağlık','Siyasi','Spiritüalizm','Sözlük','Tarih','Tarihi Roman','UFO'].forEach(function(c){CATS.push(c);});
 LANGS.length=0;['Türkçe','İngilizce','Fransızca','Almanca'].forEach(function(l){LANGS.push(l);});
 ALT_CATS.length=0;
@@ -1001,7 +1001,7 @@ function renderList(){
     return`<div class="lr${sel?' sel':''}${out?' out':(b.verilen&&b.verilen!=='-'&&b.iadeTar?' iaded':'')}" onclick="selRow(${b.id})">
       <div class="lc ctr">${b.id}</div>
       <div class="lc" title="${esc(b.baslik)} — ${esc(b.yazar)}">${(b.foto&&(photoIndex[b.foto.toLowerCase()]?.url||b.foto.startsWith('data:')))?'<span title="Fotoğraf var" style="margin-right:3px">📷</span>':''}${esc(b.baslik)}<span style="color:${sel?'#adf':'#999'};font-size:10px"> / ${esc(b.yazar)}</span></div>
-      <div class="lc">${esc(b.yayimci)}</div><div class="lc" title="${esc(b.kategori)}${b.altKategori?(' > '+esc(b.altKategori)):''}">${esc(b.kategori)}${b.altKategori?'<span style="color:${sel?'#adf':'#aaa'};font-size:9px"> ›'+esc(b.altKategori)+'</span>':''}</div><div class="lc">${esc(b.dil)}</div>
+      <div class="lc">${esc(b.yayimci)}</div><div class="lc" title="${esc(b.kategori)}${b.altKategori?' > '+esc(b.altKategori):''}">${esc(b.kategori)}${b.altKategori?('<span style="color:'+(sel?'#adf':'#aaa')+';font-size:9px"> ›'+esc(b.altKategori)+'</span>'):''}</div><div class="lc">${esc(b.dil)}</div>
       <div class="lc ctr">${b.sayfa||''}</div>
       <div class="lc ${out?'red':'grn'}">
         ${out?'⚑ '+esc(b.verilen):(b.verilen&&b.verilen!=='-'&&b.verilen!=='+'?'↩ İade':'✓ Mevcut')}
@@ -1030,7 +1030,7 @@ function fillForm(b){
  tmpFoto=null;
  showFoto(b.foto||'').catch(()=>{});
  const phtxt=document.getElementById('phtxt');
- if(phtxt && b.foto && !b.foto.startsWith('data:')) phtxt.textContent='\uD83D\uDCC1 '+b.foto.split('/').pop().split('\\').pop();
+ if(phtxt && b.foto && !b.foto.startsWith('data:')) phtxt.textContent='📁 '+b.foto.split('/').pop().split('\\').pop();
 }
 function readForm(){
  const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
