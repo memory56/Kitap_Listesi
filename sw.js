@@ -27,6 +27,7 @@ self.addEventListener('fetch', event => {
   // Only cache GET requests for same-origin or cached assets
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
   // Don't cache OneDrive or MSAL requests
   if (url.hostname.includes('microsoft') || url.hostname.includes('live.com') || url.hostname.includes('msauth')) return;
   event.respondWith(
