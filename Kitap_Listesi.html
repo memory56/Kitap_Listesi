@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="theme-color" content="#0054e3">
+<meta name="theme-color" content="#0054e3">h
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +13,7 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kitap Yönetim Sistemi v4.8.2</title>
-<script>
+<script>h
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
   const urls = [
@@ -913,13 +913,13 @@ function selectPhoto(name){
 
 async function confirmPhotoSelection(){
   if(!selectedPhotoName){ closePhotoPicker(); return; }
-  closePhotoPicker();
+  tmpFoto = selectedPhotoName;
+    closePhotoPicker();
   // Show in form
-  tmpFoto = selectedPhotoName;  // store filename, not base64
-  showFoto(selectedPhotoName);
+  showFoto(tmpFoto);
   const phtxt = document.getElementById('phtxt');
-  if(phtxt) phtxt.textContent = '📁 ' + selectedPhotoName;
-  setStatus('Fotoğraf seçildi: ' + selectedPhotoName + ' — Güncelle ile kaydedin.');
+  if(phtxt) phtxt.textContent = '📁 ' + tmpFoto;
+  setStatus('Fotoğraf seçildi: ' + tmpFoto + ' — Güncelle ile kaydedin.');
 }
 
 
