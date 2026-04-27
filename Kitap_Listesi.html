@@ -1119,7 +1119,8 @@ function btnGuncelle(){
  if(!selId){showMsg('Uyarı','⚠️ Listeden bir kayıt seçin!');return;}
  const idx=books.findIndex(b=>b.id===selId);if(idx<0)return;
  const d=readForm();
- if(!d.baslik||!d.isbn){showMsg('Uyarı','⚠️ Başlık ve ISBN boş bırakılamaz!');return;}
+ if(!d.baslik){showMsg('Uyarı','⚠️ Başlık alanı boş bırakılamaz!');return;}
+  if(!d.isbn){setStatus('⚠️ ISBN boş bırakıldı.');}
  if(d.isbn&&d.isbn!=='—'&&books.some(b=>b.isbn===d.isbn&&b.id!==selId)){showMsg('Mükerrer ISBN','⚠️ Bu ISBN başka bir kayda ait!');return;}
  d.id=selId;d.kayitTar=books[idx].kayitTar;d.guncelTar=today();
  books[idx]=d;save();doSearch();
