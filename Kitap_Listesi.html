@@ -170,7 +170,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
     <input id="cfgSheet" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Data" spellcheck="false">
     <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:6px">Excel sayfa adı (genellikle "Data")</div>
     <div style="font-size:11px;font-weight:bold;margin-bottom:3px">Fotograf klasoru (OneDrive yolu):</div>
-    <input id="cfgPhotosPath" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Documents/Kitap Listesi/VBA/Kitap Listesi/Fotoğraf" spellcheck="false">
+    <input id="cfgPhotosPath" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Kitap Listesi/VBA/Kitap Listesi/Fotoğraf" spellcheck="false">
     <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:6px">OneDrive kokunden fotograf klasorune giden yol</div>
     <div style="font-size:10px;color:#555;margin-top:10px;background:#fff;border:1px solid #ccc;padding:8px;line-height:1.6">
       <b>&#128204; Kurulum:</b><br>
@@ -406,7 +406,7 @@ async function flushPendingQueue(){
 let OD_CLIENT_ID = localStorage.getItem('od_clientId') || 'd25095c9-9ed7-46cb-a17c-708033742f44';
 let OD_FILE_NAME = localStorage.getItem('od_fileName') || 'Kitap_Listesi.xlsx';
 let OD_SHEET = localStorage.getItem('od_sheet') || 'Data';
-let OD_PHOTOS_PATH = localStorage.getItem('od_photosPath') || 'Documents/Kitap Listesi/VBA/Kitap Listesi/Fotoğraf';
+let OD_PHOTOS_PATH = localStorage.getItem('od_photosPath') || 'Kitap Listesi/VBA/Kitap Listesi/Fotoğraf';
 const GRAPH = 'https://graph.microsoft.com/v1.0';
 const SCOPES = ['User.Read', 'Files.ReadWrite'];
 
@@ -447,7 +447,7 @@ function saveCfg() {
   OD_CLIENT_ID = document.getElementById('cfgClientId').value.trim();
   OD_FILE_NAME = document.getElementById('cfgFileName').value.trim() || 'Kitap_Listesi.xlsx';
   OD_SHEET = document.getElementById('cfgSheet').value.trim() || 'Data';
-  OD_PHOTOS_PATH = (document.getElementById('cfgPhotosPath') || {value:''}).value.trim() || 'Documents/Kitap Listesi/VBA/Kitap Listesi/Fotoğraf';
+  OD_PHOTOS_PATH = (document.getElementById('cfgPhotosPath') || {value:''}).value.trim() || 'Kitap Listesi/VBA/Kitap Listesi/Fotoğraf';
   localStorage.setItem('od_clientId', OD_CLIENT_ID);
   localStorage.setItem('od_fileName', OD_FILE_NAME);
   localStorage.setItem('od_sheet', OD_SHEET);
