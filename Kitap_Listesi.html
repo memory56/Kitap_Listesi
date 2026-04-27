@@ -13,7 +13,7 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kitap Yönetim Sistemi v4.8.2</title>
-<script>
+<script>h
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
   const urls = [
@@ -873,27 +873,37 @@ function renderPhotoGrid(names){
 }
 
 async function loadVisibleThumbnails(names){
-  // Load first 20 thumbnails
-  const batch = names.slice(0, 20);
-  for(const name of batch){
-    const entry = photoIndex[name];
-    if(!entry || !entry.id) continue;
-    try {
-      const token = await getToken();
-      const res = await fetch(
-        `${GRAPH}/me/drive/items/${entry.id}/thumbnails/0/small/content`,
-        { headers: { Authorization: `Bearer ${token}` }}
-      );
-      if(!res.ok) continue;
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const key = name.replace(/[^a-z0-9]/gi,'_');
-      const el = document.querySelector(`#pg_${key} .pg-img`);
-      if(el) el.innerHTML = `<img src="${url}" style="width:90px;height:90px;object-fit:cover">`;
-    } catch(e){}
-  }
+  // Mevcut observer varsa temizle
+  if(window._thumbObserver) window._thumbObserver.disconnect();
+  const observer = new IntersectionObserver(async (entries) => {
+    for(const entry of entries){
+      if(!entry.isIntersecting) continue;
+      observer.unobserve(entry.target);
+      const el = entry.target;
+      const name = el.dataset.name;
+      if(!name || el.dataset.loaded) continue;
+      el.dataset.loaded = '1';
+      const photoEntry = photoIndex[name];
+      if(!photoEntry || !photoEntry.id) continue;
+      try {
+        const token = await getToken();
+        const res = await fetch(
+          `${GRAPH}/me/drive/items/${photoEntry.id}/thumbnails/0/small/content`,
+          { headers: { Authorization: `Bearer ${token}` }}
+        );
+        if(!res.ok) continue;
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        el.innerHTML = `<img src="${url}" style="width:90px;height:90px;object-fit:cover">`;
+      } catch(e){}
+    }
+  }, { root: document.getElementById('photoGrid'), rootMargin: '100px', threshold: 0.01 });
+  window._thumbObserver = observer;
+  // Tum pg-img elementlerini izle
+  setTimeout(() => {
+    document.querySelectorAll('#photoGrid .pg-img').forEach(el => observer.observe(el));
+  }, 50);
 }
-
 function filterPhotos(q){
   const names = Object.keys(photoIndex).filter(n => n.toLowerCase().includes(q.toLowerCase()));
   renderPhotoGrid(names);
