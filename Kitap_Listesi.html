@@ -620,8 +620,8 @@ async function readFromExcel(token) {
       verTar: r[15] != null ? excelDateToStr(r[15]) : '',
       iadeTar: r[16] != null ? excelDateToStr(r[16]) : '',
       foto: r[17] != null ? String(r[17]) : '',
-      altKategori: r[18] != null ? String(r[18]) : '',
-      aciklama: r[19] != null ? String(r[19]) : ''
+      altKategori: r[19] != null ? String(r[19]) : '',
+      aciklama: r[20] != null ? String(r[20]) : ''
     });
 
     books = rows.slice(1).map(parseBook).filter(b => b.id > 0);
@@ -642,7 +642,7 @@ function bookToRow(b) {
   return [b.id, b.baslik, b.yazar, b.yayimci, b.yayimYeri, b.isbn,
     b.basimTarihi, b.baski ?? '', b.kategori, b.dil, b.cevirmen,
     b.sayfa ?? '', b.kayitTar ?? '', b.guncelTar ?? '',
-    b.verilen ?? '', b.verTar ?? '', b.iadeTar ?? '', b.foto ?? '', b.altKategori ?? '', b.aciklama ?? ''];
+    b.verilen ?? '', b.verTar ?? '', b.iadeTar ?? '', b.foto ?? '', b.kategori ?? '', b.altKategori ?? '', b.aciklama ?? ''];
 }
 
 async function excelSyncUpdate(b) {
@@ -661,7 +661,7 @@ async function excelSyncUpdate(b) {
     if (rowIdx < 1) { await excelSyncAdd(b, token, rows.length + 1); return; }
     const excelRow = rowIdx + 1;
     await fetch(
-      `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets/${encodeURIComponent(OD_SHEET)}/range(address='A${excelRow}:T${excelRow}')`,
+      `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets/${encodeURIComponent(OD_SHEET)}/range(address='A${excelRow}:U${excelRow}')`,
       {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -677,7 +677,7 @@ async function excelSyncAdd(b, token, nextRow) {
   const t = token || await getToken();
   const row = nextRow || await getNextRow(t);
   await fetch(
-    `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets/${encodeURIComponent(OD_SHEET)}/range(address='A${row}:T${row}')`,
+    `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets/${encodeURIComponent(OD_SHEET)}/range(address='A${row}:U${row}')`,
     {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
@@ -703,7 +703,7 @@ async function excelSyncDelete(bookId) {
     if (rowIdx < 1) { setSpin(false); return; }
     const excelRow = rowIdx + 1;
     await fetch(
-      `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets/${encodeURIComponent(OD_SHEET)}/range(address='A${excelRow}:T${excelRow}')/delete`,
+      `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets/${encodeURIComponent(OD_SHEET)}/range(address='A${excelRow}:U${excelRow}')/delete`,
       {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
