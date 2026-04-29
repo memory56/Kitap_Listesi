@@ -82,7 +82,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 .fr input:focus,.fr select:focus{outline:2px solid #0054e3;outline-offset:-1px}
 .fr input[readonly]{background:#e0ddd5;color:#444}
 .fr .sep{border-top:1px dashed #aaa;grid-column:1/-1;margin:2px 0}
-.fr2{display:grid;grid-template-columns:88px 1fr 1fr;align-items:center;gap:2px;min-height:22px}
+.fr2{display:grid;grid-template-columns:88px 1fr auto 1fr;align-items:center;gap:2px;min-height:22px}
 .fr2 label{text-align:right;font-size:11px;padding-right:4px;white-space:nowrap}
 .fr2 select{height:20px;background:#fff;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 3px;font-size:11px;font-family:inherit;color:#000;outline:none;width:100%}
 .fr2 select:focus{outline:2px solid #0054e3;outline-offset:-1px}
@@ -202,8 +202,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
       </div>
       <!-- SAĞ ALANLAR -->
       <div class="fc">
-        <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect()"><option value=""></option></select><label style="margin-left:6px;font-size:11px;white-space:nowrap">Alt Kat.:</label><select id="fAltKategori" onchange="showAltKatDesc()"><option value=""></option></select></div><div id="altKatDesc" style="font-size:11px;color:#555;padding:2px 0;display:none;"></div>
-        <div class="fr"><label>Açıklama:</label><textarea id="fAciklama" rows="3" style="width:100%;resize:vertical;font-size:11px;font-family:inherit;box-sizing:border-box" placeholder="Kitap hakkında kısa not..."></textarea></div>
+        <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect()"><option value=""></option></select><label style="margin-left:6px;font-size:11px;white-space:nowrap">Alt Kat.:</label><select id="fAltKategori" onchange="showAltKatDesc()"><option value=""></option></select></div><div class="fr"><label>Açıklama:</label><textarea id="fAciklama" rows="3" style="width:100%;resize:vertical;font-size:11px;font-family:inherit;box-sizing:border-box" placeholder="Kitap hakkında kısa not..."></textarea></div>
         <div class="fr"><label>Dil:</label>
           <select id="fDil"><option value=""></option></select></div>
         <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this)" list="dl-cevirmen"></div>
@@ -997,7 +996,7 @@ function filterAltKatSelect(){
 var parentCat=document.getElementById('fKategori').value;
 rebuildAltKatSelect(parentCat);
 }
-  function showAltKatDesc(){var sel=document.getElementById('fAltKategori');var desc=document.getElementById('altKatDesc');if(!sel||!desc)return;var v=sel.value;if(!v){desc.style.display='none';desc.textContent='';return;}var found=ALT_CATS.find(function(a){return a.sub===v;});if(found&&found.desc){desc.textContent=found.desc;desc.style.display='block';}else{desc.style.display='none';desc.textContent='';} }
+  function showAltKatDesc(){}
 function init(){
  CATS.forEach(c=>{['fKategori','sCat'].forEach(id=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById(id).appendChild(o);});});
  LANGS.forEach(function(l){['fDil','sLang'].forEach(function(id){const o=document.createElement('option');o.value=l;o.textContent=l;document.getElementById(id).appendChild(o);});});
