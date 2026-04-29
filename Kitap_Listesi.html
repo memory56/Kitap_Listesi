@@ -610,7 +610,7 @@ async function readFromExcel(token) {
       isbn: r[5] != null ? String(r[5]) : '',
       basimTarihi: r[6] != null ? excelDateToStr(r[6]) : '',
       baski: r[7] != null ? String(r[7]) : '',
-      kategori: r[8] != null ? String(r[8]) : '',
+      kategori: r[18] != null ? String(r[18]) : '',
       dil: r[9] != null ? String(r[9]) : '',
       cevirmen: r[10] != null ? String(r[10]) : '',
       sayfa: r[11] != null && r[11] !== '' ? parseInt(r[11]) || null : null,
