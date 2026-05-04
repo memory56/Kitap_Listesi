@@ -203,10 +203,12 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
         <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
         <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px"></div>
-                    <div class="fr"><div class="sep"></div></div>
-                    <div class="fr"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
-                  <div class="fr"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-                  <div class="fr"><label>İade Tarihi:</label><input id="fİadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+                                            <div class="fr"><div class="sep"></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+                                                <div class="fr" style="grid-template-columns:88px 280px"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
+                                              <div class="fr" style="grid-template-columns:88px 280px"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+                                              <div class="fr" style="grid-template-columns:88px 280px"><label>İade Tarihi:</label><input id="fİadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+                                </div>
       </div>
       <!-- SAĞ ALANLAR -->
       <div class="fc">
@@ -1107,7 +1109,7 @@ function renderList(){
 function selRow(id){selId=id;const b=books.find(x=>x.id===id);if(!b)return;fillForm(b);renderList();setStatus('Seçildi: '+b.baslik);}
 
 function fillForm(b){
- const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
+ const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
  Object.entries(m).forEach(([k,v])=>document.getElementById(k).value=b[v]!=null?b[v]:'');
  document.getElementById('fSayfa').value=b.sayfa!=null?b.sayfa:'';
  document.getElementById('fKategori').value=b.kategori||'';
@@ -1123,7 +1125,7 @@ function fillForm(b){
  if(phtxt && b.foto && !b.foto.startsWith('data:')) phtxt.textContent='📁 '+b.foto.split('/').pop().split('\\').pop();
 }
 function readForm(){
- const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
+ const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
  const d={};Object.entries(m).forEach(([k,v])=>d[v]=document.getElementById(k).value.trim());
  d.id=parseInt(d.id)||null;d.sayfa=parseInt(document.getElementById('fSayfa').value)||null;
  d.kategori=document.getElementById('fKategori').value;
@@ -1177,7 +1179,7 @@ function btnSil(){
 }
 function btnTemizle(){
  selId=null;tmpFoto=null;
- ['fID','fBaslik','fYazar','fYayimci','fYayimYeri','fISBN','fBasimTarihi','fBaski','fCevirmen','fSayfa','fKayitTar','fGuncelTar','fVerilen','fVerTar','fIadeTar'].forEach(id=>document.getElementById(id).value='');
+ ['fID','fBaslik','fYazar','fYayimci','fYayimYeri','fISBN','fBasimTarihi','fBaski','fCevirmen','fSayfa','fKayitTar','fGuncelTar','','fVerTar','fIadeTar'].forEach(id=>document.getElementById(id).value='');
  document.getElementById('fKategori').value='';
  document.getElementById('fAltKategori').value='';
  document.getElementById('fAciklama').value='';
