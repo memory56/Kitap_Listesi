@@ -16,7 +16,7 @@
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
-  const urls = [h
+  const urls = [
     'https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js',
     'https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js',
     'https://unpkg.com/@azure/msal-browser@2.38.3/lib/msal-browser.min.js'
@@ -192,7 +192,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 <div class="fb">
   <div class="frame">
     <span class="flbl">Kitap Bilgileri</span>
-    <div class="tg">
+    <div class="tg" style="flex-wrap:wrap">
       <!-- SOL ALANLAR -->
       <div class="fc">
         <div class="fr"><label>ID:</label><input id="fID" readonly style="max-width:50px"></div>
@@ -203,7 +203,6 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
         <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
         <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px"></div>
-                                            
       </div>
       <!-- SAĞ ALANLAR -->
       <div class="fc">
@@ -215,11 +214,12 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr"><label>Kayıt Tar.:</label><input id="fKayitTar" readonly></div>
         <div class="fr"><label>Güncelleme:</label><input id="fGuncelTar" readonly></div>
       </div>
-              <div style="display:flex;justify-content:center;align-items:center;gap:0;border-top:1px dashed #aaa;padding-top:4px">
-                          <div class="fr" style="grid-template-columns:88px 280px"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
-                        <div class="fr" style="grid-template-columns:88px 280px"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-                        <div class="fr" style="grid-template-columns:88px 280px"><label>İade Tarihi:</label><input id="fİadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-              </div>
+      <div style="width:100%;display:flex;justify-content:center;gap:12px;border-top:1px dashed #aaa;padding-top:4px;margin-top:2px">
+        <div class="fr" style="grid-template-columns:88px 260px"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
+        <div class="fr" style="grid-template-columns:88px 140px"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+        <div class="fr" style="grid-template-columns:88px 140px"><label>İade Tarihi:</label><input id="fIadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+      </div>
+      <!-- BUTONLAR -->
       <div class="bc">
         <button class="wb def" onclick="btnEkle()">➕ Ekle</button>
         <button class="wb" onclick="btnGuncelle()">✏️ Güncelle</button>
@@ -1109,7 +1109,7 @@ function renderList(){
 function selRow(id){selId=id;const b=books.find(x=>x.id===id);if(!b)return;fillForm(b);renderList();setStatus('Seçildi: '+b.baslik);}
 
 function fillForm(b){
- const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
+ const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
  Object.entries(m).forEach(([k,v])=>document.getElementById(k).value=b[v]!=null?b[v]:'');
  document.getElementById('fSayfa').value=b.sayfa!=null?b.sayfa:'';
  document.getElementById('fKategori').value=b.kategori||'';
@@ -1125,7 +1125,7 @@ function fillForm(b){
  if(phtxt && b.foto && !b.foto.startsWith('data:')) phtxt.textContent='📁 '+b.foto.split('/').pop().split('\\').pop();
 }
 function readForm(){
- const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
+ const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
  const d={};Object.entries(m).forEach(([k,v])=>d[v]=document.getElementById(k).value.trim());
  d.id=parseInt(d.id)||null;d.sayfa=parseInt(document.getElementById('fSayfa').value)||null;
  d.kategori=document.getElementById('fKategori').value;
@@ -1179,7 +1179,7 @@ function btnSil(){
 }
 function btnTemizle(){
  selId=null;tmpFoto=null;
- ['fID','fBaslik','fYazar','fYayimci','fYayimYeri','fISBN','fBasimTarihi','fBaski','fCevirmen','fSayfa','fKayitTar','fGuncelTar','','fVerTar','fIadeTar'].forEach(id=>document.getElementById(id).value='');
+ ['fID','fBaslik','fYazar','fYayimci','fYayimYeri','fISBN','fBasimTarihi','fBaski','fCevirmen','fSayfa','fKayitTar','fGuncelTar','fVerilen','fVerTar','fIadeTar'].forEach(id=>document.getElementById(id).value='');
  document.getElementById('fKategori').value='';
  document.getElementById('fAltKategori').value='';
  document.getElementById('fAciklama').value='';
