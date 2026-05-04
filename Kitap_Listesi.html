@@ -209,7 +209,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect();doSearch()"><option value=""></option></select><label style="margin-left:6px;font-size:11px;white-space:nowrap">Alt Kat.:</label><select id="fAltKategori" onchange="showAltKatDesc();doSearch()"><option value=""></option></select></div><div class="fr"><label>Açıklama:</label><textarea id="fAciklama" rows="3" style="width:100%;resize:vertical;font-size:11px;font-family:inherit;box-sizing:border-box" placeholder="Kitap hakkında kısa not..."></textarea></div>
         <div class="fr"><label>Dil:</label>
           <select id="fDil" onchange="doSearch()"><option value=""></option></select></div>
-        <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this)" list="dl-cevirmen"></div>
+        <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this);formAutoSearch('cevirmen')" autocomplete="off"><div id="acCevirmen" class="ac-list"></div></div>
         <div class="fr"><label>Sayfa Sayısı:</label><input id="fSayfa" type="number" min="0" style="max-width:65px"></div>
         <div class="fr"><label>Kayıt Tar.:</label><input id="fKayitTar" readonly></div>
         <div class="fr"><label>Güncelleme:</label><input id="fGuncelTar" readonly></div>
@@ -989,7 +989,7 @@ function init(){
  initMsal();
 }
 function doSearch(){
- const q=(document.getElementById('fBaslik').value||'').toLocaleLowerCase('tr').trim(),qy=(document.getElementById('fYazar').value||'').toLocaleLowerCase('tr').trim(),qp=(document.getElementById('fYayimci').value||'').toLocaleLowerCase('tr').trim(),qr=(document.getElementById('fYayimYeri').value||'').toLocaleLowerCase('tr').trim(),qk=(document.getElementById('fKategori').value||'').trim(),qak=(document.getElementById('fAltKategori').value||'').trim(),ql=(document.getElementById('fDil').value||'').trim();
+ const q=(document.getElementById('fBaslik').value||'').toLocaleLowerCase('tr').trim(),qy=(document.getElementById('fYazar').value||'').toLocaleLowerCase('tr').trim(),qp=(document.getElementById('fYayimci').value||'').toLocaleLowerCase('tr').trim(),qr=(document.getElementById('fYayimYeri').value||'').toLocaleLowerCase('tr').trim(),qk=(document.getElementById('fKategori').value||'').trim(),qak=(document.getElementById('fAltKategori').value||'').trim(),ql=(document.getElementById('fDil').value||'').trim(),qce=(document.getElementById('fCevirmen').value||'').toLocaleLowerCase('tr').trim();
  filtered=books.filter(b=>{
    if(q&&!(b.baslik||'').toLocaleLowerCase('tr').includes(q))return false;
    if(qy&&!(b.yazar||'').toLocaleLowerCase('tr').includes(qy))return false;
@@ -998,14 +998,15 @@ function doSearch(){
    if(qk&&(b.kategori||'')!==qk)return false;
    if(qak&&(b.altKategori||'')!==qak)return false;
    if(ql&&(b.dil||'')!==ql)return false;
+   if(qce&&!(b.cevirmen||'').toLocaleLowerCase('tr').includes(qce))return false;
    return true;
  });
  filtered.sort((a,b)=>{let av=a[sCol],bv=b[sCol];if(av==null)av='';if(bv==null)bv='';return typeof av==='string'?av.localeCompare(bv,'tr')*sDir:(av-bv)*sDir;});
  renderList();
 }
 function formAutoSearch(field){
- var fieldMap={baslik:'fBaslik',yazar:'fYazar',yayimci:'fYayimci',yayimYeri:'fYayimYeri'};
- var acMap={baslik:'acBaslik',yazar:'acYazar',yayimci:'acYayimci',yayimYeri:'acYayimYeri'};
+ var fieldMap={baslik:'fBaslik',yazar:'fYazar',yayimci:'fYayimci',yayimYeri:'fYayimYeri',cevirmen:'fCevirmen'};
+ var acMap={baslik:'acBaslik',yazar:'acYazar',yayimci:'acYayimci',yayimYeri:'acYayimYeri',cevirmen:'acCevirmen'};
  var inputId=fieldMap[field]; var acId=acMap[field];
  if(!inputId||!acId)return;
  var ac=document.getElementById(acId); if(!ac)return;
@@ -1044,9 +1045,9 @@ function btnAra(){
  if(!q&&!qy){filtered=books.slice();renderList();return;}
  doSearch();
 }
-const clearSearch=()=>{['fBaslik','fYazar','fYayimci','fYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});['fKategori','fAltKategori','fDil'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});filtered=books.slice();renderList();};
+const clearSearch=()=>{['fBaslik','fYazar','fYayimci','fYayimYeri','fCevirmen'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar','acYayimci','acYayimYeri','acCevirmen'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});['fKategori','fAltKategori','fDil'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});filtered=books.slice();renderList();};
 document.addEventListener('click',function(e){
- if(!e.target.closest('.fr'))['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+ if(!e.target.closest('.fr'))['acBaslik','acYazar','acYayimci','acYayimYeri','acCevirmen'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
 });
 function sortBy(col){if(sCol===col)sDir*=-1;else{sCol=col;sDir=1;}document.querySelectorAll('.lh').forEach(c=>{c.classList.remove('sorted');if(c.dataset.col===col)c.classList.add('sorted');});doSearch();}
 
