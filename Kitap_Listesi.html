@@ -471,6 +471,7 @@ async function initMsal() {
       cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
     });
     await msalApp.initialize();
+    await msalApp.handleRedirectPromise().catch(() => {}); // interaction_in_progress fix
     const accounts = msalApp.getAllAccounts();
     if (accounts.length > 0) {
       odAccount = accounts[0];
@@ -507,6 +508,7 @@ async function loginOneDrive() {
         cache: { cacheLocation: 'localStorage' }
       });
       await msalApp.initialize();
+      await msalApp.handleRedirectPromise().catch(() => {}); // interaction_in_progress fix
     } catch(e) { setOdStatus(`❌ MSAL hatası: ${e.message}`, 'err'); return; }
   }
   try {
