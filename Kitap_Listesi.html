@@ -203,12 +203,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
         <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
         <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px"></div>
-                                            <div class="fr"><div class="sep"></div></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
-                                                <div class="fr" style="grid-template-columns:88px 280px"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
-                                              <div class="fr" style="grid-template-columns:88px 280px"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-                                              <div class="fr" style="grid-template-columns:88px 280px"><label>İade Tarihi:</label><input id="fİadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-                                </div>
+                                            
       </div>
       <!-- SAĞ ALANLAR -->
       <div class="fc">
@@ -220,6 +215,11 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr"><label>Kayıt Tar.:</label><input id="fKayitTar" readonly></div>
         <div class="fr"><label>Güncelleme:</label><input id="fGuncelTar" readonly></div>
       </div>
+              <div style="display:flex;justify-content:center;align-items:center;gap:0;border-top:1px dashed #aaa;padding-top:4px">
+                          <div class="fr" style="grid-template-columns:88px 280px"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
+                        <div class="fr" style="grid-template-columns:88px 280px"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+                        <div class="fr" style="grid-template-columns:88px 280px"><label>İade Tarihi:</label><input id="fİadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+              </div>
       <div class="bc">
         <button class="wb def" onclick="btnEkle()">➕ Ekle</button>
         <button class="wb" onclick="btnGuncelle()">✏️ Güncelle</button>
