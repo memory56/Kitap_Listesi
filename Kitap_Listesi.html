@@ -198,8 +198,8 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <div class="fr"><label>ID:</label><input id="fID" readonly style="max-width:50px"></div>
         <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this);formAutoSearch('baslik')" autocomplete="off"><div id="acBaslik" class="ac-list"></div></div>
         <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this);formAutoSearch('yazar')" autocomplete="off" list="dl-yazar"><div id="acYazar" class="ac-list"></div></div>
-        <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this)" list="dl-yayimci"></div>
-        <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri" oninput="titleCaseInput(this)" list="dl-yayimyeri"></div>
+        <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this);formAutoSearch('yayimci')" autocomplete="off" list="dl-yayimci"><div id="acYayimci" class="ac-list"></div></div>
+        <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri" oninput="titleCaseInput(this);formAutoSearch('yayimYeri')" autocomplete="off" list="dl-yayimyeri"><div id="acYayimYeri" class="ac-list"></div></div>
         <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
         <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
         <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px"></div>
@@ -999,37 +999,51 @@ function init(){
  initMsal();
 }
 function doSearch(){
- const q=(document.getElementById('fBaslik').value||'').toLowerCase().trim(),qy=(document.getElementById('fYazar').value||'').toLowerCase().trim();
+ const q=(document.getElementById('fBaslik').value||'').toLocaleLowerCase('tr').trim(),qy=(document.getElementById('fYazar').value||'').toLocaleLowerCase('tr').trim(),qp=(document.getElementById('fYayimci').value||'').toLocaleLowerCase('tr').trim(),qr=(document.getElementById('fYayimYeri').value||'').toLocaleLowerCase('tr').trim();
  filtered=books.filter(b=>{
-   if(q&&!`${b.baslik||''} ${b.yayimci||''}`.toLowerCase().includes(q))return false;
-   if(qy&&!(b.yazar||'').toLowerCase().includes(qy))return false;
+   if(q&&!(b.baslik||'').toLocaleLowerCase('tr').includes(q))return false;
+   if(qy&&!(b.yazar||'').toLocaleLowerCase('tr').includes(qy))return false;
+   if(qp&&!(b.yayimci||'').toLocaleLowerCase('tr').includes(qp))return false;
+   if(qr&&!(b.yayimYeri||'').toLocaleLowerCase('tr').includes(qr))return false;
    return true;
  });
  filtered.sort((a,b)=>{let av=a[sCol],bv=b[sCol];if(av==null)av='';if(bv==null)bv='';return typeof av==='string'?av.localeCompare(bv,'tr')*sDir:(av-bv)*sDir;});
  renderList();
 }
 function formAutoSearch(field){
- var inputId=field==='baslik'?'fBaslik':'fYazar';
- var acId=field==='baslik'?'acBaslik':'acYazar';
- var val=(document.getElementById(inputId).value||'').toLowerCase().trim();
- var ac=document.getElementById(acId);
- if(!ac)return;
- if(val.length<3){ac.style.display='none';if(val.length===0){filtered=books.slice();renderList();}return;}
- var matches=[];var seen={};
+ var fieldMap={baslik:'fBaslik',yazar:'fYazar',yayimci:'fYayimci',yayimYeri:'fYayimYeri'};
+ var acMap={baslik:'acBaslik',yazar:'acYazar',yayimci:'acYayimci',yayimYeri:'acYayimYeri'};
+ var inputId=fieldMap[field]; var acId=acMap[field];
+ if(!inputId||!acId)return;
+ var ac=document.getElementById(acId); if(!ac)return;
+ var val=(document.getElementById(inputId).value||'').toLocaleLowerCase('tr').trim();
+ if(val.length<3){ac.style.display='none';if(val.length===0)doSearch();return;}
+ var seen={}; var matches=[];
  books.forEach(function(b){
-  var v=field==='baslik'?(b.baslik||''):(b.yazar||'');
-  if(v.toLowerCase().includes(val)&&!seen[v]){seen[v]=1;matches.push({id:b.id,label:v});}
+  var v=(b[field]||'');
+  if(v.toLocaleLowerCase('tr').includes(val)&&!seen[v]){seen[v]=1;matches.push({id:b.id,label:v});}
  });
  if(matches.length===0){ac.style.display='none';doSearch();return;}
- ac.innerHTML=matches.slice(0,20).map(function(m){return '<div onclick="acSelect(\'' + field + '\',' + m.id + ')">' + m.label + '</div>';}).join('');
+ var isRow=(field==='baslik');
+ ac.innerHTML=matches.slice(0,25).map(function(m){
+  if(isRow)return '<div onclick="acSelect(\'baslik\','+m.id+',true)">'+m.label+'</div>';
+  return '<div onclick="acSelect(\''+field+'\','+m.id+',false)">'+m.label+'</div>';
+ }).join('');
  ac.style.display='block';
  doSearch();
 }
-function acSelect(field,id){
- var acId=field==='baslik'?'acBaslik':'acYazar';
- var ac=document.getElementById(acId);
+function acSelect(field,id,isRow){
+ var fieldMap={baslik:'fBaslik',yazar:'fYazar',yayimci:'fYayimci',yayimYeri:'fYayimYeri'};
+ var acMap={baslik:'acBaslik',yazar:'acYazar',yayimci:'acYayimci',yayimYeri:'acYayimYeri'};
+ var ac=document.getElementById(acMap[field]);
  if(ac)ac.style.display='none';
- selRow(id);
+ if(isRow){
+  selRow(id);
+ } else {
+  var book=books.find(function(b){return b.id===id;});
+  if(book&&fieldMap[field])document.getElementById(fieldMap[field]).value=book[field]||'';
+  doSearch();
+ }
 }
 function btnAra(){
  var q=(document.getElementById('fBaslik').value||'').trim();
@@ -1037,7 +1051,10 @@ function btnAra(){
  if(!q&&!qy){filtered=books.slice();renderList();return;}
  doSearch();
 }
-const clearSearch=()=>{['fBaslik','fYazar'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();};
+const clearSearch=()=>{['fBaslik','fYazar','fYayimci','fYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();};
+document.addEventListener('click',function(e){
+ if(!e.target.closest('.fr'))['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+});
 function sortBy(col){if(sCol===col)sDir*=-1;else{sCol=col;sDir=1;}document.querySelectorAll('.lh').forEach(c=>{c.classList.remove('sorted');if(c.dataset.col===col)c.classList.add('sorted');});doSearch();}
 
 function updateDataLists(){
@@ -1172,7 +1189,7 @@ function btnTemizle(){
  document.getElementById('fAltKategori').value='';
  document.getElementById('fAciklama').value='';
  document.getElementById('fDil').value='';
- document.getElementById('pinput').value='';showFoto('');['acBaslik','acYazar'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();setStatus('Form temizlendi.');
+ document.getElementById('pinput').value='';showFoto('');['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();setStatus('Form temizlendi.');
 }
 function btnFoto(){
   if(odConnected && Object.keys(photoIndex).length > 0){
