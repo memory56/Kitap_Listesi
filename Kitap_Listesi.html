@@ -206,9 +206,9 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
       </div>
       <!-- SAĞ ALANLAR -->
       <div class="fc">
-        <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect()"><option value=""></option></select><label style="margin-left:6px;font-size:11px;white-space:nowrap">Alt Kat.:</label><select id="fAltKategori" onchange="showAltKatDesc()"><option value=""></option></select></div><div class="fr"><label>Açıklama:</label><textarea id="fAciklama" rows="3" style="width:100%;resize:vertical;font-size:11px;font-family:inherit;box-sizing:border-box" placeholder="Kitap hakkında kısa not..."></textarea></div>
+        <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect();doSearch()"><option value=""></option></select><label style="margin-left:6px;font-size:11px;white-space:nowrap">Alt Kat.:</label><select id="fAltKategori" onchange="showAltKatDesc();doSearch()"><option value=""></option></select></div><div class="fr"><label>Açıklama:</label><textarea id="fAciklama" rows="3" style="width:100%;resize:vertical;font-size:11px;font-family:inherit;box-sizing:border-box" placeholder="Kitap hakkında kısa not..."></textarea></div>
         <div class="fr"><label>Dil:</label>
-          <select id="fDil"><option value=""></option></select></div>
+          <select id="fDil" onchange="doSearch()"><option value=""></option></select></div>
         <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this)" list="dl-cevirmen"></div>
         <div class="fr"><label>Sayfa Sayısı:</label><input id="fSayfa" type="number" min="0" style="max-width:65px"></div>
         <div class="fr"><label>Kayıt Tar.:</label><input id="fKayitTar" readonly></div>
@@ -965,18 +965,8 @@ try{localStorage.removeItem('kys4_altcats');}catch(e){}
 rebuildSelects();closeListEditor();setStatus('Varsayilana donduruldu');
 }
 function rebuildSelects(){
-['fKategori','sCat'].forEach(function(id){
-  var sel=document.getElementById(id);var cur=sel.value;
-  while(sel.options.length>1)sel.remove(1);
-  CATS.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
-  // Alt kategorileri de ekle (--- ile ayrılmış)
-  if(ALT_CATS.length>0){
-    var sep=document.createElement('option');sep.disabled=true;sep.textContent='── Alt Kategoriler ──';sel.appendChild(sep);
-    ALT_CATS.forEach(function(a){var o=document.createElement('option');o.value=a.sub;o.textContent=a.parent+' > '+a.sub;sel.appendChild(o);});
-  }
-  sel.value=cur;
-});
-['fDil','sLang'].forEach(function(id){var sel=document.getElementById(id);var cur=sel.value;while(sel.options.length>1)sel.remove(1);LANGS.forEach(function(l){var o=document.createElement('option');o.value=l;o.textContent=l;sel.appendChild(o);});sel.value=cur;});
+{var sel=document.getElementById('fKategori');var cur=sel.value;while(sel.options.length>1)sel.remove(1);CATS.forEach(function(c){var o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});if(ALT_CATS.length>0){var sep=document.createElement('option');sep.disabled=true;sep.textContent='── Alt Kategoriler ──';sel.appendChild(sep);ALT_CATS.forEach(function(a){var o=document.createElement('option');o.value=a.sub;o.textContent=a.parent+' > '+a.sub;sel.appendChild(o);});}sel.value=cur;}
+{var sel=document.getElementById('fDil');var cur=sel.value;while(sel.options.length>1)sel.remove(1);LANGS.forEach(function(l){var o=document.createElement('option');o.value=l;o.textContent=l;sel.appendChild(o);});sel.value=cur;}
 rebuildAltKatSelect(document.getElementById('fKategori').value);
 }
 function rebuildAltKatSelect(parentCat){
@@ -991,20 +981,23 @@ rebuildAltKatSelect(parentCat);
 }
   function showAltKatDesc(){}
 function init(){
- CATS.forEach(c=>{['fKategori','sCat'].forEach(id=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById(id).appendChild(o);});});
- LANGS.forEach(function(l){['fDil','sLang'].forEach(function(id){const o=document.createElement('option');o.value=l;o.textContent=l;document.getElementById(id).appendChild(o);});});
+ CATS.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;document.getElementById('fKategori').appendChild(o);});
+ LANGS.forEach(function(l){const o=document.createElement('option');o.value=l;o.textContent=l;document.getElementById('fDil').appendChild(o);});
  rebuildAltKatSelect('');
  doSearch();
  setStatus('Hazır — '+books.length+' kitap yüklendi. '+(pendingQueue.length?'['+pendingQueue.length+' bekleyen işlem]':''));
  initMsal();
 }
 function doSearch(){
- const q=(document.getElementById('fBaslik').value||'').toLocaleLowerCase('tr').trim(),qy=(document.getElementById('fYazar').value||'').toLocaleLowerCase('tr').trim(),qp=(document.getElementById('fYayimci').value||'').toLocaleLowerCase('tr').trim(),qr=(document.getElementById('fYayimYeri').value||'').toLocaleLowerCase('tr').trim();
+ const q=(document.getElementById('fBaslik').value||'').toLocaleLowerCase('tr').trim(),qy=(document.getElementById('fYazar').value||'').toLocaleLowerCase('tr').trim(),qp=(document.getElementById('fYayimci').value||'').toLocaleLowerCase('tr').trim(),qr=(document.getElementById('fYayimYeri').value||'').toLocaleLowerCase('tr').trim(),qk=(document.getElementById('fKategori').value||'').trim(),qak=(document.getElementById('fAltKategori').value||'').trim(),ql=(document.getElementById('fDil').value||'').trim();
  filtered=books.filter(b=>{
    if(q&&!(b.baslik||'').toLocaleLowerCase('tr').includes(q))return false;
    if(qy&&!(b.yazar||'').toLocaleLowerCase('tr').includes(qy))return false;
    if(qp&&!(b.yayimci||'').toLocaleLowerCase('tr').includes(qp))return false;
    if(qr&&!(b.yayimYeri||'').toLocaleLowerCase('tr').includes(qr))return false;
+   if(qk&&(b.kategori||'')!==qk)return false;
+   if(qak&&(b.altKategori||'')!==qak)return false;
+   if(ql&&(b.dil||'')!==ql)return false;
    return true;
  });
  filtered.sort((a,b)=>{let av=a[sCol],bv=b[sCol];if(av==null)av='';if(bv==null)bv='';return typeof av==='string'?av.localeCompare(bv,'tr')*sDir:(av-bv)*sDir;});
@@ -1051,7 +1044,7 @@ function btnAra(){
  if(!q&&!qy){filtered=books.slice();renderList();return;}
  doSearch();
 }
-const clearSearch=()=>{['fBaslik','fYazar','fYayimci','fYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();};
+const clearSearch=()=>{['fBaslik','fYazar','fYayimci','fYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});['fKategori','fAltKategori','fDil'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});filtered=books.slice();renderList();};
 document.addEventListener('click',function(e){
  if(!e.target.closest('.fr'))['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
 });
