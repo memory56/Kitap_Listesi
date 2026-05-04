@@ -1,5 +1,5 @@
-// Kitap Yönetim Sistemi - Service Worker v4.6
-const CACHE_NAME = 'kys-v4.6';
+// Kitap Yönetim Sistemi - Service Worker v4.8.2
+const CACHE_NAME = 'kys-v4.8.2';
 const urlsToCache = [
   './',
   './Kitap_Listesi.html',
