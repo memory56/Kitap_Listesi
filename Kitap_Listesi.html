@@ -1021,7 +1021,7 @@ function formAutoSearch(field){
  var seen={}; var matches=[];
  books.forEach(function(b){
   var v=(b[field]||'');
-  if(v.toLocaleLowerCase('tr').includes(val)&&!seen[v]){seen[v]=1;matches.push({id:b.id,label:v});}
+  if(v.toLocaleLowerCase('tr').startsWith(val)&&!seen[v]){seen[v]=1;matches.push({id:b.id,label:v});}
  });
  if(matches.length===0){ac.style.display='none';doSearch();return;}
  var isRow=(field==='baslik');
