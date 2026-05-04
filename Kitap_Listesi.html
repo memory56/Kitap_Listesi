@@ -195,7 +195,6 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
     <div class="tg">
       <!-- SOL ALANLAR -->
       <div class="fc">
-        <div class="fr"><label>ID:</label><input id="fID" readonly style="max-width:50px"></div>
         <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this);formAutoSearch('baslik')" autocomplete="off"><div id="acBaslik" class="ac-list"></div></div>
         <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this);formAutoSearch('yazar')" autocomplete="off" list="dl-yazar"><div id="acYazar" class="ac-list"></div></div>
         <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this);formAutoSearch('yayimci')" autocomplete="off" list="dl-yayimci"><div id="acYayimci" class="ac-list"></div></div>
@@ -1108,7 +1107,7 @@ function renderList(){
 function selRow(id){selId=id;const b=books.find(x=>x.id===id);if(!b)return;fillForm(b);renderList();setStatus('Seçildi: '+b.baslik);}
 
 function fillForm(b){
- const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
+ const m={fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
  Object.entries(m).forEach(([k,v])=>document.getElementById(k).value=b[v]!=null?b[v]:'');
  document.getElementById('fSayfa').value=b.sayfa!=null?b.sayfa:'';
  document.getElementById('fKategori').value=b.kategori||'';
@@ -1124,7 +1123,7 @@ function fillForm(b){
  if(phtxt && b.foto && !b.foto.startsWith('data:')) phtxt.textContent='📁 '+b.foto.split('/').pop().split('\\').pop();
 }
 function readForm(){
- const m={fID:'id',fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
+ const m={fBaslik:'baslik',fYazar:'yazar',fYayimci:'yayimci',fYayimYeri:'yayimYeri',fISBN:'isbn',fBasimTarihi:'basimTarihi',fBaski:'baski',fCevirmen:'cevirmen',fKayitTar:'kayitTar',fGuncelTar:'guncelTar',fVerilen:'verilen',fVerTar:'verTar',fIadeTar:'iadeTar'};
  const d={};Object.entries(m).forEach(([k,v])=>d[v]=document.getElementById(k).value.trim());
  d.id=parseInt(d.id)||null;d.sayfa=parseInt(document.getElementById('fSayfa').value)||null;
  d.kategori=document.getElementById('fKategori').value;
@@ -1180,7 +1179,7 @@ function btnSil(){
 }
 function btnTemizle(){
  selId=null;tmpFoto=null;
- ['fID','fBaslik','fYazar','fYayimci','fYayimYeri','fISBN','fBasimTarihi','fBaski','fCevirmen','fSayfa','fKayitTar','fGuncelTar','fVerilen','fVerTar','fIadeTar'].forEach(id=>document.getElementById(id).value='');
+ ['fBaslik','fYazar','fYayimci','fYayimYeri','fISBN','fBasimTarihi','fBaski','fCevirmen','fSayfa','fKayitTar','fGuncelTar','fVerilen','fVerTar','fIadeTar'].forEach(id=>document.getElementById(id).value='');
  document.getElementById('fKategori').value='';
  document.getElementById('fAltKategori').value='';
  document.getElementById('fAciklama').value='';
