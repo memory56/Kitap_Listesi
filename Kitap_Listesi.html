@@ -224,8 +224,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
         <button class="wb def" onclick="btnEkle()">➕ Ekle</button>
         <button class="wb" onclick="btnGuncelle()">✏️ Güncelle</button>
         <button class="wb red" onclick="btnSil()">🗑️ Sil</button>
-        <div class="bsep"></div>
-        <button class="wb" onclick="btnFotoSil()">❌ Foto Sil</button>
+        
               <div class="bsep"></div>
               <button class="wb" onclick="openListEditor()">&#128203; Listeler</button>
         <div class="bsep"></div>
@@ -1169,6 +1168,8 @@ function btnSil(){
  showConfirm('Sil','🗑️ Silmek istediğinize emin misiniz?\n\n"'+b.baslik+'"',()=>{
    const fi=filtered.findIndex(x=>x.id===selId);
    const delId=selId;
+   const delFoto=b.foto||'';
+   deleteFotoFile(delFoto);
    books.splice(books.findIndex(x=>x.id===delId),1);save();
    if(odConnected){excelSyncDelete(delId);}else{addPending({type:'delete',bookId:delId});showPendingInfo();}
    const ns=filtered[fi+1]||filtered[fi-1];
@@ -1239,10 +1240,18 @@ async function uploadPhotoToOneDrive(file){
   photoIndex[safeName.toLowerCase()] = { id: data.id };
   return safeName;
 }
-function btnFotoSil(){
+async function deleteFotoFile(fotoVal){
+  if(!fotoVal) return;
   tmpFoto='';showFoto('');
-  if(selId){const b=books.find(x=>x.id===selId);if(b){b.foto='';save();}}
-  setStatus('Fotoğraf silindi.');
+  const fname=fotoVal.trim().replace(/\\/g,'/').split('/').pop();
+  const entry=photoIndex[fname.toLowerCase()];
+  if(entry&&entry.id&&odConnected){
+    try{
+      const token=await getToken();
+      await fetch(`${GRAPH}/me/drive/items/${entry.id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+      delete photoIndex[fname.toLowerCase()];
+    }catch(e){console.warn('Foto OneDrive silme hatasi:',e);}
+  }
 }
 const photoCache = new Map();
 async function showFoto(src){
