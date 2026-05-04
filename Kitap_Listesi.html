@@ -466,7 +466,7 @@ async function initMsal() {
       auth: {
         clientId: OD_CLIENT_ID,
         authority: 'https://login.microsoftonline.com/common',
-        redirectUri: window.location.origin + window.location.pathname
+        redirectUri: 'https://memory56.github.io/Kitap_Listesi/Kitap_Listesi.html'
       },
       cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
     });
@@ -502,7 +502,7 @@ async function loginOneDrive() {
         auth: {
           clientId: OD_CLIENT_ID,
           authority: 'https://login.microsoftonline.com/common',
-          redirectUri: window.location.origin + window.location.pathname
+          redirectUri: 'https://memory56.github.io/Kitap_Listesi/Kitap_Listesi.html'
         },
         cache: { cacheLocation: 'localStorage' }
       });
