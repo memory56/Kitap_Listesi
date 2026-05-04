@@ -136,6 +136,10 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 .od-btn:hover{background:#d8d5ca}.od-btn:active{border-color:#808080 #fff #fff #808080}
 .od-btn.primary{background:#0054e3;color:#fff;border-color:#003ab0}
 .od-btn.primary:hover{background:#0040c0}
+  .ac-list { position:absolute; z-index:9999; background:#fff; border:1px solid #0054e3; border-radius:0 0 4px 4px; max-height:180px; overflow-y:auto; width:100%; box-shadow:0 4px 8px rgba(0,0,0,.15); display:none; left:0; top:100%; }
+  .ac-list div { padding:4px 8px; cursor:pointer; font-size:12px; border-bottom:1px solid #f0f0f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ac-list div:hover { background:#e8f0fe; }
+  .fr { position:relative; }
 </style>
 </head>
 <body>
@@ -192,8 +196,8 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
       <!-- SOL ALANLAR -->
       <div class="fc">
         <div class="fr"><label>ID:</label><input id="fID" readonly style="max-width:50px"></div>
-        <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this)"></div>
-        <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this)" list="dl-yazar"></div>
+        <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this);formAutoSearch('baslik')" autocomplete="off"><div id="acBaslik" class="ac-list"></div></div>
+        <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this);formAutoSearch('yazar')" autocomplete="off" list="dl-yazar"><div id="acYazar" class="ac-list"></div></div>
         <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this)" list="dl-yayimci"></div>
         <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri" oninput="titleCaseInput(this)" list="dl-yayimyeri"></div>
         <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
@@ -224,6 +228,8 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
               <div class="bsep"></div>
               <button class="wb" onclick="openListEditor()">&#128203; Listeler</button>
         <div class="bsep"></div>
+        <button class="wb" onclick="btnAra()">&#128269; Ara</button>
+        <div class="bsep"></div>
         <button class="wb" onclick="btnTemizle()">🔄 Temizle</button>
       </div>
       <!-- FOTOĞRAF -->
@@ -239,21 +245,6 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
   </div>
 
   <!-- ARAMA -->
-  <div class="sr">
-    <span class="slbl">🔍 ARA</span>
-    <label>Başlık/Yazar:</label>
-    <input id="sQ" style="width:175px" placeholder="metin ara…" oninput="doSearch()">
-    <label>Kategori:</label>
-    <select id="sCat" onchange="doSearch()"><option value="">-- Tümü --</option></select>
-    <label>Dil:</label>
-    <select id="sLang" onchange="doSearch()"><option value="">-- Tümü --</option></select>
-    <label>Durum:</label>
-    <select id="sSt" onchange="doSearch()">
-      <option value="">-- Tümü --</option><option value="ok">Mevcut</option><option value="out">Verilmiş</option>
-    </select>
-    <button class="wb" style="height:20px;font-size:11px" onclick="clearSearch()">Temizle</button>
-  </div>
-
   <!-- LİSTE BAŞLIĞI -->
   <div style="flex:1;display:flex;flex-direction:column;min-height:0;margin-top:2px"><div class="lhdr">
     <div class="lh" onclick="sortBy('id')" data-col="id">No ↕</div>
@@ -1008,19 +999,45 @@ function init(){
  initMsal();
 }
 function doSearch(){
- const q=document.getElementById('sQ').value.toLowerCase(),cat=document.getElementById('sCat').value,lang=document.getElementById('sLang').value,st=document.getElementById('sSt').value;
+ const q=(document.getElementById('fBaslik').value||'').toLowerCase().trim(),qy=(document.getElementById('fYazar').value||'').toLowerCase().trim();
  filtered=books.filter(b=>{
-   if(q&&!`${b.baslik} ${b.yazar} ${b.yayimci}`.toLowerCase().includes(q))return false;
-   if(cat&&b.kategori!==cat&&b.altKategori!==cat)return false;
-   if(lang&&b.dil!==lang)return false;
-   if(st==='ok'&&isOut(b))return false;
-   if(st==='out'&&!isOut(b))return false;
+   if(q&&!`${b.baslik||''} ${b.yayimci||''}`.toLowerCase().includes(q))return false;
+   if(qy&&!(b.yazar||'').toLowerCase().includes(qy))return false;
    return true;
  });
  filtered.sort((a,b)=>{let av=a[sCol],bv=b[sCol];if(av==null)av='';if(bv==null)bv='';return typeof av==='string'?av.localeCompare(bv,'tr')*sDir:(av-bv)*sDir;});
  renderList();
 }
-const clearSearch=()=>{['sQ','sCat','sLang','sSt'].forEach(id=>document.getElementById(id).value='');doSearch();};
+function formAutoSearch(field){
+ var inputId=field==='baslik'?'fBaslik':'fYazar';
+ var acId=field==='baslik'?'acBaslik':'acYazar';
+ var val=(document.getElementById(inputId).value||'').toLowerCase().trim();
+ var ac=document.getElementById(acId);
+ if(!ac)return;
+ if(val.length<3){ac.style.display='none';if(val.length===0){filtered=books.slice();renderList();}return;}
+ var matches=[];var seen={};
+ books.forEach(function(b){
+  var v=field==='baslik'?(b.baslik||''):(b.yazar||'');
+  if(v.toLowerCase().includes(val)&&!seen[v]){seen[v]=1;matches.push({id:b.id,label:v});}
+ });
+ if(matches.length===0){ac.style.display='none';doSearch();return;}
+ ac.innerHTML=matches.slice(0,20).map(function(m){return '<div onclick="acSelect(\'' + field + '\',' + m.id + ')">' + m.label + '</div>';}).join('');
+ ac.style.display='block';
+ doSearch();
+}
+function acSelect(field,id){
+ var acId=field==='baslik'?'acBaslik':'acYazar';
+ var ac=document.getElementById(acId);
+ if(ac)ac.style.display='none';
+ selRow(id);
+}
+function btnAra(){
+ var q=(document.getElementById('fBaslik').value||'').trim();
+ var qy=(document.getElementById('fYazar').value||'').trim();
+ if(!q&&!qy){filtered=books.slice();renderList();return;}
+ doSearch();
+}
+const clearSearch=()=>{['fBaslik','fYazar'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});['acBaslik','acYazar'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();};
 function sortBy(col){if(sCol===col)sDir*=-1;else{sCol=col;sDir=1;}document.querySelectorAll('.lh').forEach(c=>{c.classList.remove('sorted');if(c.dataset.col===col)c.classList.add('sorted');});doSearch();}
 
 function updateDataLists(){
@@ -1155,7 +1172,7 @@ function btnTemizle(){
  document.getElementById('fAltKategori').value='';
  document.getElementById('fAciklama').value='';
  document.getElementById('fDil').value='';
- document.getElementById('pinput').value='';showFoto('');renderList();setStatus('Form temizlendi.');
+ document.getElementById('pinput').value='';showFoto('');['acBaslik','acYazar'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();setStatus('Form temizlendi.');
 }
 function btnFoto(){
   if(odConnected && Object.keys(photoIndex).length > 0){
