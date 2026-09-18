@@ -1,5 +1,5 @@
-// Kitap Yönetim Sistemi - Service Worker v4.8.6
-const CACHE_NAME = 'kys-v4.8.13';
+// Kitap Yönetim Sistemi - Service Worker v4.8.14
+const CACHE_NAME = 'kys-v4.8.14';
 const urlsToCache = [
   './',
   './Kitap_Listesi.html',
@@ -27,19 +27,20 @@ self.addEventListener('fetch', event => {
   // Only cache GET requests for same-origin or cached assets
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return;
   // Don't cache OneDrive or MSAL requests
   if (url.hostname.includes('microsoft') || url.hostname.includes('live.com') || url.hostname.includes('msauth')) return;
+  // Network-first: her zaman en güncel sürümü almaya çalış, sadece çevrimdışı/hata
+  // durumunda önbelleğe düş. Eskiden "önce önbellek, arka planda güncelle" (stale-
+  // while-revalidate) kullanılıyordu; bu, deploy sonrası kullanıcıların bir sürüm
+  // geriden görmesine (bir sonraki ziyarette güncellenmesine) yol açıyordu.
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      const fetchPromise = fetch(event.request).then(response => {
-        if (response && response.status === 200 && response.type === 'basic') {
-          const cloned = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, cloned));
-        }
-        return response;
-      }).catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(event.request).then(response => {
+      if (response && response.status === 200 && response.type === 'basic') {
+        const cloned = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, cloned));
+      }
+      return response;
+    }).catch(() => caches.match(event.request))
   );
 });
