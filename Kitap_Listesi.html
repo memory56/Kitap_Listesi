@@ -195,28 +195,28 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
     <div class="tg">
       <!-- SOL ALANLAR -->
       <div class="fc">
-        <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this);formAutoSearch('baslik')" autocomplete="off"><div id="acBaslik" class="ac-list"></div></div>
-        <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this);formAutoSearch('yazar')" autocomplete="off" list="dl-yazar"><div id="acYazar" class="ac-list"></div></div>
-        <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this);formAutoSearch('yayimci')" autocomplete="off" list="dl-yayimci"><div id="acYayimci" class="ac-list"></div></div>
-        <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri" oninput="titleCaseInput(this);formAutoSearch('yayimYeri')" autocomplete="off" list="dl-yayimyeri"><div id="acYayimYeri" class="ac-list"></div></div>
-        <div class="fr"><label>ISBN:</label><input id="fISBN"></div>
-        <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-        <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px"></div>
+        <div class="fr"><label>Başlık:</label><input id="fBaslik" oninput="titleCaseInput(this);formAutoSearch('baslik')" autocomplete="off" onblur="hideAcDelayed('acBaslik')"><div id="acBaslik" class="ac-list" onmousedown="event.preventDefault()"></div></div>
+        <div class="fr"><label>Yazar:</label><input id="fYazar" oninput="titleCaseInput(this);formAutoSearch('yazar')" autocomplete="off" onblur="hideAcDelayed('acYazar')"><div id="acYazar" class="ac-list" onmousedown="event.preventDefault()"></div></div>
+        <div class="fr"><label>Yayımcı:</label><input id="fYayimci" oninput="titleCaseInput(this);formAutoSearch('yayimci')" autocomplete="off" onblur="hideAcDelayed('acYayimci')"><div id="acYayimci" class="ac-list" onmousedown="event.preventDefault()"></div></div>
+        <div class="fr"><label>Yayım Yeri:</label><input id="fYayimYeri" oninput="titleCaseInput(this);formAutoSearch('yayimYeri')" autocomplete="off" onblur="hideAcDelayed('acYayimYeri')"><div id="acYayimYeri" class="ac-list" onmousedown="event.preventDefault()"></div></div>
+        <div class="fr"><label>ISBN:</label><input id="fISBN" autocomplete="off"></div>
+        <div class="fr"><label>Basım Tarihi:</label><input id="fBasimTarihi" placeholder="GG.AA.YYYY" autocomplete="off" onblur="formatDateField(this)"></div>
+        <div class="fr"><label>Baskı:</label><input id="fBaski" style="max-width:65px" autocomplete="off"></div>
       </div>
       <!-- SAĞ ALANLAR -->
       <div class="fc">
         <div class="fr2"><label>Kategori:</label><select id="fKategori" onchange="filterAltKatSelect();doSearch()"><option value=""></option></select><label style="margin-left:6px;font-size:11px;white-space:nowrap">Alt Kat.:</label><select id="fAltKategori" onchange="showAltKatDesc();doSearch()"><option value=""></option></select></div><div class="fr"><label>Açıklama:</label><textarea id="fAciklama" rows="3" style="width:100%;resize:vertical;font-size:11px;font-family:inherit;box-sizing:border-box" placeholder="Kitap hakkında kısa not..."></textarea></div>
         <div class="fr"><label>Dil:</label>
           <select id="fDil" onchange="doSearch()"><option value=""></option></select></div>
-        <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this);formAutoSearch('cevirmen')" autocomplete="off"><div id="acCevirmen" class="ac-list"></div></div>
-        <div class="fr"><label>Sayfa Sayısı:</label><input id="fSayfa" type="number" min="0" style="max-width:65px"></div>
+        <div class="fr"><label>Çevirmen:</label><input id="fCevirmen" oninput="titleCaseInput(this);formAutoSearch('cevirmen')" autocomplete="off" onblur="hideAcDelayed('acCevirmen')"><div id="acCevirmen" class="ac-list" onmousedown="event.preventDefault()"></div></div>
+        <div class="fr"><label>Sayfa Sayısı:</label><input id="fSayfa" type="number" min="0" style="max-width:65px" autocomplete="off"></div>
         <div class="fr"><label>Kayıt Tar.:</label><input id="fKayitTar" readonly></div>
         <div class="fr"><label>Güncelleme:</label><input id="fGuncelTar" readonly></div>
       </div>
       <div style="grid-column:1;grid-row:2;align-self:end;display:flex;flex-direction:column;gap:2px;border-top:1px dashed #aaa;padding-top:4px">
-        <div class="fr" style="grid-template-columns:88px 1fr"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı"></div>
-        <div class="fr" style="grid-template-columns:88px 1fr"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
-        <div class="fr" style="grid-template-columns:88px 1fr"><label>İade Tarihi:</label><input id="fIadeTar" placeholder="GG.AA.YYYY" onblur="formatDateField(this)"></div>
+        <div class="fr" style="grid-template-columns:88px 1fr"><label>Verilen:</label><input id="fVerilen" placeholder="Kişi adı" autocomplete="off"></div>
+        <div class="fr" style="grid-template-columns:88px 1fr"><label>Ver. Tarihi:</label><input id="fVerTar" placeholder="GG.AA.YYYY" autocomplete="off" onblur="formatDateField(this)"></div>
+        <div class="fr" style="grid-template-columns:88px 1fr"><label>İade Tarihi:</label><input id="fIadeTar" placeholder="GG.AA.YYYY" autocomplete="off" onblur="formatDateField(this)"></div>
       </div>
       <!-- BUTONLAR -->
       <div class="bc">
@@ -1037,6 +1037,9 @@ function acSelect(field,id,isRow){
   if(book&&fieldMap[field])document.getElementById(fieldMap[field]).value=book[field]||'';
   doSearch();
  }
+}
+function hideAcDelayed(acId){
+ setTimeout(function(){ var el=document.getElementById(acId); if(el) el.style.display='none'; }, 150);
 }
 function btnAra(){
  var q=(document.getElementById('fBaslik').value||'').trim();
