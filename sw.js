@@ -1,5 +1,5 @@
-// Kitap Yönetim Sistemi - Service Worker v4.8.14
-const CACHE_NAME = 'kys-v4.8.14';
+// Kitap Yönetim Sistemi - Service Worker v4.8.15
+const CACHE_NAME = 'kys-v4.8.15';
 const urlsToCache = [
   './',
   './Kitap_Listesi.html',
@@ -31,11 +31,11 @@ self.addEventListener('fetch', event => {
   // Don't cache OneDrive or MSAL requests
   if (url.hostname.includes('microsoft') || url.hostname.includes('live.com') || url.hostname.includes('msauth')) return;
   // Network-first: her zaman en güncel sürümü almaya çalış, sadece çevrimdışı/hata
-  // durumunda önbelleğe düş. Eskiden "önce önbellek, arka planda güncelle" (stale-
-  // while-revalidate) kullanılıyordu; bu, deploy sonrası kullanıcıların bir sürüm
-  // geriden görmesine (bir sonraki ziyarette güncellenmesine) yol açıyordu.
+  // durumunda önbelleğe düş. cache:'no-store' ile GitHub Pages'in kendi HTTP
+  // önbelleği (Cache-Control: max-age=600) de es geçiliyor; aksi halde deploy
+  // sonrası 10 dakikaya kadar tarayıcı hâlâ eski sürümü "taze" sayıp gösterebilirdi.
   event.respondWith(
-    fetch(event.request).then(response => {
+    fetch(event.request, { cache: 'no-store' }).then(response => {
       if (response && response.status === 200 && response.type === 'basic') {
         const cloned = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, cloned));
