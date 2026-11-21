@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.8.2</title>
+<title>Kitap Yönetim Sistemi v4.9.0</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -233,12 +233,13 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
       </div>
       <!-- FOTOĞRAF -->
       <div class="pw">
-        <div id="pbox" onclick="btnFoto()" title="Fotoğraf yüklemek için tıklayın (photos/ klasöründen otomatik yüklenir)">
+        <div id="pbox" onclick="btnFoto()" title="Fotoğraf eklemek için tıklayın (OneDrive, kamera veya dosya)">
           <img id="pimg" src="" alt="Kapak" loading="lazy" style="transition:opacity 0.3s">
           <div class="phi">📷</div>
           <div id="phtxt">Fotoğraf Yok</div>
         </div>
         <input type="file" id="pinput" accept="image/*" onchange="onFotoSel(this)">
+        <input type="file" id="pinputCam" accept="image/*" capture="environment" style="display:none" onchange="onCamFileSel(this)">
       </div>
     </div>
   </div>
@@ -929,7 +930,7 @@ async function confirmPhotoSelection(){
 
 
 function triggerFileInput(){var inp=document.getElementById('pinput');inp.style.cssText='display:block;position:fixed;left:-9999px;top:-9999px;opacity:0;width:1px;height:1px';inp.click();setTimeout(function(){inp.style.cssText='display:none';},1000);}
-function showPhotoMenu(){var pbox=document.getElementById('pbox');var rect=pbox.getBoundingClientRect();var existing=document.getElementById('photoMenu');if(existing){existing.remove();return;}var menu=document.createElement('div');menu.id='photoMenu';menu.style.cssText='position:fixed;left:'+rect.left+'px;top:'+(rect.bottom+2)+'px;background:#ece9d8;border:1px solid;border-color:#fff #808080 #808080 #fff;box-shadow:3px 3px 6px rgba(0,0,0,.3);z-index:999;min-width:190px';var item1=document.createElement('div');item1.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer;border-bottom:1px solid #c0bdb5';item1.textContent='🖼\uFE0F OneDrive\'dan Se\u00E7';item1.onmouseover=function(){this.style.background='#dde8ff';};item1.onmouseout=function(){this.style.background='';};item1.onclick=function(){openPhotoPicker();menu.remove();};var item2=document.createElement('div');item2.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer';item2.textContent='💻 Bilgisayardan Y\u00FCkle';item2.onmouseover=function(){this.style.background='#dde8ff';};item2.onmouseout=function(){this.style.background='';};item2.onclick=function(){triggerFileInput();menu.remove();};menu.appendChild(item1);menu.appendChild(item2);document.body.appendChild(menu);setTimeout(function(){document.addEventListener('click',function handler(e){if(!menu.contains(e.target)&&e.target!==pbox){menu.remove();document.removeEventListener('click',handler);}});},100);}
+function showPhotoMenu(){var pbox=document.getElementById('pbox');var rect=pbox.getBoundingClientRect();var existing=document.getElementById('photoMenu');if(existing){existing.remove();return;}var menu=document.createElement('div');menu.id='photoMenu';menu.style.cssText='position:fixed;left:'+Math.max(4,Math.min(rect.left,window.innerWidth-204))+'px;top:'+(rect.bottom+2)+'px;background:#ece9d8;border:1px solid;border-color:#fff #808080 #808080 #fff;box-shadow:3px 3px 6px rgba(0,0,0,.3);z-index:999;min-width:190px';var item1=document.createElement('div');item1.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer;border-bottom:1px solid #c0bdb5';item1.textContent='🖼\uFE0F OneDrive\'dan Se\u00E7';item1.onmouseover=function(){this.style.background='#dde8ff';};item1.onmouseout=function(){this.style.background='';};item1.onclick=function(){openPhotoPicker();menu.remove();};var item2=document.createElement('div');item2.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer';item2.textContent='💻 Bilgisayardan Y\u00FCkle';item2.onmouseover=function(){this.style.background='#dde8ff';};item2.onmouseout=function(){this.style.background='';};item2.onclick=function(){triggerFileInput();menu.remove();};var item3=document.createElement('div');item3.style.cssText='padding:5px 10px;font-size:11px;cursor:pointer;border-bottom:1px solid #c0bdb5';item3.textContent='\uD83D\uDCF8 Kamerayla \u00C7ek';item3.onmouseover=function(){this.style.background='#dde8ff';};item3.onmouseout=function(){this.style.background='';};item3.onclick=function(){menu.remove();openCamera();};item2.textContent='\uD83D\uDCBB Dosyadan / Galeriden Y\u00FCkle';if(odConnected&&Object.keys(photoIndex).length>0){menu.appendChild(item1);}menu.appendChild(item3);menu.appendChild(item2);document.body.appendChild(menu);setTimeout(function(){document.addEventListener('click',function handler(e){if(!menu.contains(e.target)&&e.target!==pbox){menu.remove();document.removeEventListener('click',handler);}});},100);}
 function openListEditor(){
 document.getElementById('leKategori').value=CATS.join('\n');
 document.getElementById('leDil').value=LANGS.join('\n');
@@ -1190,11 +1191,7 @@ function btnTemizle(){
  document.getElementById('pinput').value='';showFoto('');['acBaslik','acYazar','acYayimci','acYayimYeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});filtered=books.slice();renderList();setStatus('Form temizlendi.');
 }
 function btnFoto(){
-  if(odConnected && Object.keys(photoIndex).length > 0){
-    showPhotoMenu();
-  } else {
-    triggerFileInput();
-  }
+  showPhotoMenu();
 }
 function updatePhotoHint(filename){
   const el=document.getElementById('phtxt');
@@ -1378,6 +1375,200 @@ init();
     <button type="button" onclick="confirmAddAltKat()" style="padding:4px 12px;background:#005ea2;color:white;border:none;border-radius:3px;cursor:pointer;">Ekle</button>
   </div>
 </dialog>
+<!-- KAMERA MODAL -->
+<div id="camModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;flex-direction:column">
+  <div style="background:#ece9d8;border:1px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:min(96vw,720px);max-height:96vh;display:flex;flex-direction:column">
+    <div style="background:linear-gradient(90deg,#0054e3,#3d8af7);color:#fff;font-size:12px;font-weight:bold;padding:4px 6px;display:flex;justify-content:space-between;align-items:center">
+      <span>📸 Kamerayla Fotoğraf Çek</span>
+      <button onclick="closeCamera()" style="background:#d4d0c8;border:1px solid;border-color:#fff #808080 #808080 #fff;color:#000;width:17px;height:15px;font-size:9px;cursor:pointer">✕</button>
+    </div>
+    <div style="position:relative;background:#000;flex:1;min-height:240px;display:flex;align-items:center;justify-content:center">
+      <video id="camVideo" autoplay playsinline muted style="max-width:100%;max-height:70vh;display:block"></video>
+      <img id="camShot" alt="" style="max-width:100%;max-height:70vh;display:none">
+      <div id="camMsg" style="position:absolute;color:#fff;font-size:12px;text-align:center;padding:10px"></div>
+    </div>
+    <div style="padding:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+      <button class="wb" id="camSwitchBtn" onclick="switchCamera()" style="display:none">🔄 Kamerayı Değiştir</button>
+      <button class="wb def" id="camSnapBtn" onclick="snapCamera()">📸 Çek</button>
+      <button class="wb" id="camRetakeBtn" onclick="retakeCamera()" style="display:none">↩️ Tekrar Çek</button>
+      <button class="wb def" id="camUseBtn" onclick="useCameraShot()" style="display:none">✓ Kullan ve Kaydet</button>
+      <button class="wb" onclick="closeCamera()">İptal</button>
+    </div>
+  </div>
+</div>
+<script>
+// ===== KAMERA İLE FOTOĞRAF =====
+var camStream=null, camFacing='environment', camBlob=null, camShotUrl=null;
+
+async function openCamera(){
+  // Kamera API'si yoksa (eski tarayıcı / HTTPS değil) telefonun yerel kamerasına düş
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.isSecureContext){
+    document.getElementById('pinputCam').click();
+    return;
+  }
+  document.getElementById('camModal').style.display='flex';
+  retakeCamera();
+  await startCameraStream();
+}
+
+async function startCameraStream(){
+  stopCameraStream();
+  var msg=document.getElementById('camMsg');
+  msg.textContent='Kamera açılıyor...';
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:camFacing},width:{ideal:1920},height:{ideal:1080}},audio:false
+    });
+    var v=document.getElementById('camVideo');
+    v.srcObject=camStream;
+    await v.play().catch(function(){});
+    msg.textContent='';
+    try{
+      var devs=await navigator.mediaDevices.enumerateDevices();
+      var cams=devs.filter(function(d){return d.kind==='videoinput';});
+      document.getElementById('camSwitchBtn').style.display=cams.length>1?'':'none';
+    }catch(e){}
+  }catch(err){
+    stopCameraStream();
+    var name=err&&err.name||'';
+    if(name==='NotAllowedError'||name==='SecurityError'){
+      msg.innerHTML='⚠️ Kamera izni verilmedi.<br>Tarayıcı ayarlarından bu siteye kamera izni verin.';
+    }else if(name==='NotFoundError'||name==='OverconstrainedError'){
+      msg.innerHTML='⚠️ Kamera bulunamadı.';
+    }else{
+      msg.innerHTML='⚠️ Kamera açılamadı: '+(err.message||name);
+    }
+    // Telefonda yerel kamera uygulamasıyla denemek için yedek
+    msg.innerHTML+='<br><br><button class="wb" onclick="closeCamera();document.getElementById(\'pinputCam\').click()">📱 Cihazın kamera uygulamasını kullan</button>';
+  }
+}
+
+function stopCameraStream(){
+  if(camStream){camStream.getTracks().forEach(function(t){t.stop();});camStream=null;}
+  var v=document.getElementById('camVideo');if(v)v.srcObject=null;
+}
+
+function switchCamera(){
+  camFacing=(camFacing==='environment')?'user':'environment';
+  startCameraStream();
+}
+
+function snapCamera(){
+  var v=document.getElementById('camVideo');
+  if(!camStream||!v.videoWidth){setStatus('⚠️ Kamera hazır değil.');return;}
+  var maxDim=1600, w=v.videoWidth, h=v.videoHeight;
+  if(w>maxDim||h>maxDim){
+    if(w>=h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;}
+  }
+  var c=document.createElement('canvas');c.width=w;c.height=h;
+  c.getContext('2d').drawImage(v,0,0,w,h);
+  c.toBlob(function(blob){
+    if(!blob){setStatus('⚠️ Fotoğraf alınamadı.');return;}
+    camBlob=blob;
+    if(camShotUrl)URL.revokeObjectURL(camShotUrl);
+    camShotUrl=URL.createObjectURL(blob);
+    var img=document.getElementById('camShot');img.src=camShotUrl;img.style.display='block';
+    v.style.display='none';
+    stopCameraStream();
+    document.getElementById('camSnapBtn').style.display='none';
+    document.getElementById('camSwitchBtn').style.display='none';
+    document.getElementById('camRetakeBtn').style.display='';
+    document.getElementById('camUseBtn').style.display='';
+  },'image/jpeg',0.85);
+}
+
+function retakeCamera(){
+  camBlob=null;
+  document.getElementById('camShot').style.display='none';
+  document.getElementById('camVideo').style.display='block';
+  document.getElementById('camSnapBtn').style.display='';
+  document.getElementById('camRetakeBtn').style.display='none';
+  document.getElementById('camUseBtn').style.display='none';
+  if(document.getElementById('camModal').style.display==='flex'&&!camStream)startCameraStream();
+}
+
+function closeCamera(){
+  stopCameraStream();
+  document.getElementById('camModal').style.display='none';
+  if(camShotUrl){URL.revokeObjectURL(camShotUrl);camShotUrl=null;}
+  camBlob=null;
+}
+
+// Fotoğraf dosya adı: Kitap_<ID>_<Başlık>_<tarih-saat>.jpg
+function cameraFileName(){
+  var t=new Date(),p=function(n){return String(n).padStart(2,'0');};
+  var stamp=t.getFullYear()+p(t.getMonth()+1)+p(t.getDate())+'_'+p(t.getHours())+p(t.getMinutes())+p(t.getSeconds());
+  var baslik=(document.getElementById('fBaslik').value||'').trim()
+    .replace(/[^a-zA-Z0-9À-ɏ ]/g,'').replace(/\s+/g,'_').slice(0,40);
+  return 'Kitap_'+(selId?selId:'Yeni')+(baslik?'_'+baslik:'')+'_'+stamp+'.jpg';
+}
+
+async function useCameraShot(){
+  if(!camBlob)return;
+  var file=new File([camBlob],cameraFileName(),{type:'image/jpeg'});
+  closeCamera();
+  await processCameraFile(file);
+}
+
+// Cihazın kendi kamera uygulamasından (capture input) gelen fotoğraf
+async function onCamFileSel(inp){
+  if(!inp.files||!inp.files[0])return;
+  var orig=inp.files[0];inp.value='';
+  var file;
+  try{
+    var dataUrl=await resizeImageFile(orig,1600,0.85);
+    var blob=await (await fetch(dataUrl)).blob();
+    file=new File([blob],cameraFileName(),{type:'image/jpeg'});
+  }catch(err){
+    setStatus('⚠️ Fotoğraf işlenemedi ('+(err.message||err)+')');return;
+  }
+  await processCameraFile(file);
+}
+
+// Ortak işlem: ön izleme → OneDrive'a yükle → seçili kitabın kaydına (Excel) yaz
+async function processCameraFile(file){
+  var localDataUrl;
+  try{localDataUrl=await resizeImageFile(file,1000,0.7);}
+  catch(err){setStatus('⚠️ Fotoğraf küçültülemedi — eklenmedi.');return;}
+  tmpFoto=localDataUrl;
+  showFoto(tmpFoto);
+
+  if(!(odConnected&&photosFolderIdGlobal)){
+    setStatus('📸 Fotoğraf çekildi — OneDrive bağlı değil, yerel olarak tutuluyor. Ekle/Güncelle ile kaydedin.');
+    return;
+  }
+  setStatus('📤 OneDrive\'a yükleniyor: '+file.name+'...');
+  var uploadedName;
+  try{
+    uploadedName=await uploadPhotoToOneDrive(file);
+  }catch(err){
+    setStatus('⚠️ OneDrive\'a yüklenemedi ('+(err.message||err)+') — Yerel resim kullanılıyor, Ekle/Güncelle ile kaydedin.');
+    return;
+  }
+  tmpFoto=uploadedName;
+  showFoto(uploadedName);
+  var ph=document.getElementById('phtxt');if(ph)ph.textContent='📁 '+uploadedName;
+
+  // Listeden seçili bir kitap varsa, fotoğraf adını hemen OneDrive'daki veri listesine yaz
+  var idx=selId?books.findIndex(function(b){return b.id===selId;}):-1;
+  if(idx>=0){
+    books[idx].foto=uploadedName;
+    books[idx].guncelTar=today();
+    save();
+    try{
+      await excelSyncUpdate(books[idx]);
+      setStatus('✅ Fotoğraf OneDrive\'a yüklendi ve kitap kaydına işlendi: '+uploadedName);
+    }catch(err){
+      addPending({type:'update',book:books[idx]});showPendingInfo();
+      setStatus('⚠️ Fotoğraf yüklendi ama veri listesi güncellenemedi — bekleyen işlemlere eklendi.');
+    }
+    try{renderList();}catch(e){}
+  }else{
+    setStatus('✅ Fotoğraf OneDrive\'a yüklendi: '+uploadedName+' — Yeni kitabı "Ekle" ile kaydedin.');
+  }
+}
+</script>
+
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
