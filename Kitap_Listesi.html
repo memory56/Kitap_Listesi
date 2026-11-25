@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.10.1</title>
+<title>Kitap Yönetim Sistemi v4.10.2</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -145,7 +145,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 <body>
 <div id="win">
 <div class="tbar">
-  <div class="tbar-l">📚 Kitap Yönetim Sistemi v4.10.1</div>
+  <div class="tbar-l">📚 Kitap Yönetim Sistemi v4.10.2</div>
   <div class="tbar-b"><div class="tb">_</div><div class="tb">□</div><div class="tb" onclick="doExit()">✕</div></div>
 </div>
 <div id="sb"><span id="st">Hazır</span><span id="sc"></span></div>
@@ -1075,12 +1075,25 @@ async function ensureFolder(parentId, name, t){
 }
 
 function logoutOneDrive() {
-  if (msalApp && odAccount) {
-    msalApp.logoutPopup({ account: odAccount }).catch(()=>{});
-    odAccount = null; odFileId = null; odConnected = false;
-    setOdUI(false);
-    setOdStatus(`Bağlantı kesildi`, '');
-  }
+  if (!msalApp || !odAccount) return;
+  let msg = 'Hesaptan çıkış yapılacak ve kitap listesi bu cihazdan temizlenecek.\nVerileriniz OneDrive\'daki Excel dosyanızda kalır; tekrar bağlanınca geri gelir.';
+  if (pendingQueue.length) msg += '\n\n⚠️ Excel\'e henüz aktarılmamış ' + pendingQueue.length + ' değişiklik var. Çıkış yaparsanız bu değişiklikler kaybolur.';
+  showConfirm('Çıkış', msg, doLogout);
+}
+function doLogout() {
+  const acc = odAccount;
+  msalApp.logoutPopup({ account: acc }).catch(()=>{});
+  odAccount = null; odFileId = null; odConnected = false;
+  // Bu cihazdaki kişisel veriyi temizle (kategori/dil listeleri korunur)
+  ['kys4','kys4_pending','kys4_lastId','kys4_setupDone','od_fileId','od_fileName','od_sheet','od_photosPath']
+    .forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+  books = []; pendingQueue = []; nId = 1; selId = null; tmpFoto = null;
+  photoIndex = {}; photosFolderIdGlobal = null;
+  OD_FILE_NAME = 'Kitap_Listesi.xlsx'; OD_SHEET = 'Data'; OD_PHOTOS_PATH = 'Kitap Listesi/VBA/Kitap Listesi/Fotoğraf';
+  btnTemizle(); doSearch();
+  setOdUI(false);
+  setOdStatus(`Bağlantı kesildi — liste bu cihazdan temizlendi`, '');
+  setStatus('Hazır — 0 kitap');
 }
 
 
