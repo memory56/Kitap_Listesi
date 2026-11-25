@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.10.0</title>
+<title>Kitap Yönetim Sistemi v4.10.1</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -145,7 +145,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 <body>
 <div id="win">
 <div class="tbar">
-  <div class="tbar-l">📚 Kitap Yönetim Sistemi v4.10.0</div>
+  <div class="tbar-l">📚 Kitap Yönetim Sistemi v4.10.1</div>
   <div class="tbar-b"><div class="tb">_</div><div class="tb">□</div><div class="tb" onclick="doExit()">✕</div></div>
 </div>
 <div id="sb"><span id="st">Hazır</span><span id="sc"></span></div>
@@ -199,30 +199,31 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 <!-- CONFIG MODAL -->
 <div id="cfgModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center">
 <div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:460px;max-width:95vw">
-  <div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px">&#9881;&#65039; OneDrive Bağlantı Ayarları</div>
-  <div style="padding:14px 16px">
-    <div style="font-size:11px;font-weight:bold;margin-bottom:3px">Azure Application (Client) ID:</div>
-    <input id="cfgClientId" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px;font-family:monospace" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="d25095c9-9ed7-46cb-a17c-708033742f44" spellcheck="false">
-    <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:8px">portal.azure.com → App registrations → Uygulamanız → Application (client) ID</div>
-    <div style="font-size:11px;font-weight:bold;margin-bottom:3px">OneDrive'daki Excel dosya adı:</div>
-    <input id="cfgFileName" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Kitap_Listesi.xlsx" spellcheck="false">
-    <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:8px">&#9888;&#65039; .xlsb değil, .xlsx olmalı &nbsp; <button class="od-btn" style="display:inline-flex;height:18px;font-size:10px" onclick="changeExcelFile()">&#128193; OneDrive'dan seç…</button></div>
-    <div style="font-size:11px;font-weight:bold;margin-bottom:3px">Excel Sheet adı:</div>
-    <input id="cfgSheet" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Data" spellcheck="false">
-    <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:6px">Excel sayfa adı (genellikle "Data")</div>
-    <div style="font-size:11px;font-weight:bold;margin-bottom:3px">Fotograf klasoru (OneDrive yolu):</div>
-    <input id="cfgPhotosPath" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Kitap Listesi/VBA/Kitap Listesi/Fotoğraf" spellcheck="false">
-    <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:6px">OneDrive kokunden fotograf klasorune giden yol</div>
-    <div style="font-size:10px;color:#555;margin-top:10px;background:#fff;border:1px solid #ccc;padding:8px;line-height:1.6">
-      <b>&#128204; Kurulum:</b><br>
-      1. Azure'da SPA olarak redirect URI: <code>http://localhost:8080</code><br>
-      2. Bu dosyanın bulunduğu klasörde: <code>python -m http.server 8080</code><br>
-      3. Tarayıcıda: <code>http://localhost:8080/Kitap_Listesi.html</code>
+  <div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px">&#9881;&#65039; Ayarlar</div>
+  <div style="padding:12px 16px;font-size:12px">
+    <div style="background:#fff;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:8px 10px;line-height:1.8">
+      <div>&#128100; Hesap: <b id="cfgInfoAccount"></b></div>
+      <div>&#128215; Excel dosyası: <b id="cfgInfoFile"></b></div>
+      <div>&#128193; Konumu: <span id="cfgInfoFolder"></span></div>
+      <div>&#128444;&#65039; Fotoğraf klasörü: <span id="cfgInfoPhotos"></span></div>
     </div>
+    <div style="margin-top:10px"><button class="od-btn primary" onclick="changeExcelFile()">&#128193; Excel dosyasını değiştir…</button></div>
+    <div style="font-size:10px;color:#666;margin-top:4px">Listeyi başka bir dosyaya veya klasöre taşımak için. Fotoğraf klasörü seçilen Excel'in yanına kurulur.</div>
+    <details style="margin-top:12px">
+      <summary style="cursor:pointer;font-size:11px;color:#333">Gelişmiş ayarlar (normalde değiştirmeyin)</summary>
+      <div style="font-size:11px;font-weight:bold;margin:8px 0 3px">Azure Application (Client) ID:</div>
+      <input id="cfgClientId" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px;font-family:monospace" spellcheck="false">
+      <div style="font-size:11px;font-weight:bold;margin:8px 0 3px">Excel dosya adı:</div>
+      <input id="cfgFileName" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" spellcheck="false">
+      <div style="font-size:11px;font-weight:bold;margin:8px 0 3px">Excel sayfa adı:</div>
+      <input id="cfgSheet" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" spellcheck="false">
+      <div style="font-size:11px;font-weight:bold;margin:8px 0 3px">Fotoğraf klasörü (OneDrive kökünden yol):</div>
+      <input id="cfgPhotosPath" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" spellcheck="false">
+      <div style="margin-top:8px;display:flex;justify-content:flex-end"><button class="od-btn" onclick="saveCfg()">&#128190; Kaydet ve yeniden bağlan</button></div>
+    </details>
   </div>
   <div style="padding:8px 12px;display:flex;justify-content:flex-end;gap:6px">
-    <button class="od-btn" onclick="closeCfg()">İptal</button>
-    <button class="od-btn primary" onclick="saveCfg()">&#128190; Kaydet ve Bağlan</button>
+    <button class="od-btn" onclick="closeCfg()">Kapat</button>
   </div>
 </div>
 </div>
@@ -467,7 +468,20 @@ function openCfg() {
   setVal('cfgFileName', OD_FILE_NAME);
   setVal('cfgSheet', OD_SHEET);
   setVal('cfgPhotosPath', OD_PHOTOS_PATH);
+  const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setTxt('cfgInfoAccount', odAccount ? (odAccount.name || odAccount.username || 'Bağlı') : 'Bağlı değil');
+  setTxt('cfgInfoFile', odFileId ? OD_FILE_NAME : 'Seçilmedi');
+  setTxt('cfgInfoFolder', odFileId ? '…' : '—');
+  setTxt('cfgInfoPhotos', photosFolderIdGlobal ? 'OneDrive › ' + OD_PHOTOS_PATH.split('/').join(' › ') : '—');
   document.getElementById('cfgModal').style.display = 'flex';
+  if (odFileId && odAccount) {
+    getToken().then(t => fetch(`${GRAPH}/me/drive/items/${odFileId}?$select=name,parentReference`, { headers: { Authorization: `Bearer ${t}` }}))
+      .then(r => r.json()).then(d => {
+        const p = decodeURIComponent((d.parentReference?.path || '').replace(/^\/drive\/root:\/?/, ''));
+        setTxt('cfgInfoFolder', 'OneDrive' + (p ? ' › ' + p.split('/').join(' › ') : ''));
+        if (d.name) setTxt('cfgInfoFile', d.name);
+      }).catch(() => setTxt('cfgInfoFolder', '—'));
+  }
 }
 function closeCfg() { document.getElementById('cfgModal').style.display = 'none'; }
 function saveCfg() {
