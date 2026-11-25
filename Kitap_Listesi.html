@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kitap Yönetim Sistemi v4.9.2</title>
+<title>Kitap Yönetim Sistemi v4.10.0</title>
 <script>
 // MSAL dinamik yükleyici - birden fazla CDN dener
 (function() {
@@ -145,7 +145,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
 <body>
 <div id="win">
 <div class="tbar">
-  <div class="tbar-l">📚 Kitap Yönetim Sistemi v4.9.2</div>
+  <div class="tbar-l">📚 Kitap Yönetim Sistemi v4.10.0</div>
   <div class="tbar-b"><div class="tb">_</div><div class="tb">□</div><div class="tb" onclick="doExit()">✕</div></div>
 </div>
 <div id="sb"><span id="st">Hazır</span><span id="sc"></span></div>
@@ -159,6 +159,43 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
   <button class="od-btn" onclick="openCfg()">&#9881;&#65039; Ayarlar</button>
   <button id="btnOdOut" class="od-btn" onclick="logoutOneDrive()" style="display:none">Çıkış</button>
 </div>
+<!-- İLK KURULUM: KARŞILAMA -->
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;align-items:center;justify-content:center">
+<div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:440px;max-width:95vw">
+  <div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px">📚 Kitap Yönetim Sistemi'ne Hoş Geldiniz</div>
+  <div style="padding:14px 16px;font-size:12px;line-height:1.6">
+    Kitap listeniz <b>kendi OneDrive hesabınızda</b>, bir Excel dosyasında tutulur. Sizden başka kimse göremez.<br><br>
+    <b>Kurulum iki adımdır:</b><br>
+    1. Microsoft hesabınızla (Outlook / Hotmail) giriş yapın.<br>
+    2. Kitap listesi Excel dosyasının bulunduğu klasörü seçin.<br>
+    &nbsp;&nbsp;&nbsp;Dosyanız yoksa uygulama seçtiğiniz klasöre <b>boş bir liste</b> oluşturur.<br><br>
+    <span style="color:#555;font-size:11px">Fotoğraf klasörü ve Excel sayfası (Data) otomatik hazırlanır.</span>
+  </div>
+  <div style="padding:8px 12px;display:flex;justify-content:flex-end;gap:6px">
+    <button class="od-btn" onclick="closeWelcome()">Daha sonra</button>
+    <button class="od-btn primary" onclick="welcomeConnect()">🔑 Microsoft hesabıyla bağlan</button>
+  </div>
+</div>
+</div>
+<!-- İLK KURULUM: EXCEL KLASÖRÜ SEÇİCİ -->
+<div id="pickerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;align-items:center;justify-content:center">
+<div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:500px;max-width:95vw">
+  <div style="background:linear-gradient(to right,#0054e3,#3b95ff);color:#fff;padding:4px 8px;font-weight:bold;font-size:12px">📁 Kitap listesi Excel dosyasını seçin</div>
+  <div style="padding:10px 12px;font-size:11px;line-height:1.5">
+    Excel dosyanızın olduğu klasöre gidip dosyaya (📗) tıklayın. Dosyanız yoksa listeyi tutmak istediğiniz klasöre gidip <b>"Bu klasörde yeni boş liste oluştur"</b> düğmesine basın.
+    <div style="display:flex;gap:6px;align-items:center;margin-top:8px">
+      <button id="pickerUpBtn" class="od-btn" onclick="pickerUp()">⬆ Üst klasör</button>
+      <div id="pickerCrumb" style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+    </div>
+    <div id="pickerList" style="margin-top:6px;background:#fff;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;height:260px;overflow:auto;font-size:12px"></div>
+  </div>
+  <div style="padding:8px 12px;display:flex;justify-content:space-between;gap:6px">
+    <button class="od-btn primary" onclick="pickerCreateNew()">➕ Bu klasörde yeni boş liste oluştur</button>
+    <button class="od-btn" onclick="closePicker()">İptal</button>
+  </div>
+</div>
+</div>
+
 <!-- CONFIG MODAL -->
 <div id="cfgModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center">
 <div style="background:#ece9d8;border:2px solid;border-color:#fff #808080 #808080 #fff;box-shadow:4px 4px 10px rgba(0,0,0,.5);width:460px;max-width:95vw">
@@ -169,7 +206,7 @@ body{background:#d4d0c8;font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;
     <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:8px">portal.azure.com → App registrations → Uygulamanız → Application (client) ID</div>
     <div style="font-size:11px;font-weight:bold;margin-bottom:3px">OneDrive'daki Excel dosya adı:</div>
     <input id="cfgFileName" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Kitap_Listesi.xlsx" spellcheck="false">
-    <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:8px">&#9888;&#65039; .xlsb değil, .xlsx olmalı</div>
+    <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:8px">&#9888;&#65039; .xlsb değil, .xlsx olmalı &nbsp; <button class="od-btn" style="display:inline-flex;height:18px;font-size:10px" onclick="changeExcelFile()">&#128193; OneDrive'dan seç…</button></div>
     <div style="font-size:11px;font-weight:bold;margin-bottom:3px">Excel Sheet adı:</div>
     <input id="cfgSheet" style="width:100%;height:24px;border:1px solid;border-color:#808080 #dfdfdf #dfdfdf #808080;padding:0 4px;font-size:12px" value="Data" spellcheck="false">
     <div style="font-size:10px;color:#666;margin-top:3px;margin-bottom:6px">Excel sayfa adı (genellikle "Data")</div>
@@ -310,9 +347,8 @@ const DEFAULT_LANGS=['Türkçe','İngilizce','Fransızca','Almanca'];
 let CATS=(function(){try{const s=localStorage.getItem('kys4_cats');return s?JSON.parse(s):DEFAULT_CATS;}catch(e){return DEFAULT_CATS;}})();
 let LANGS=(function(){try{const s=localStorage.getItem('kys4_langs');return s?JSON.parse(s):DEFAULT_LANGS;}catch(e){return DEFAULT_LANGS;}})();
 let ALT_CATS=(function(){try{var s=localStorage.getItem('kys4_altcats');return s?JSON.parse(s):DEFAULT_ALT_CATS;}catch(e){return DEFAULT_ALT_CATS;}})();
-const RAW=[[1,'MS 2150','Thea Alexander','AKAŞA','TÜRKİYE','975-6793-21','2005',3,'Roman','Türkçe','Nedret Şanlı',384,null,'24.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[2,'Gizli Sırlar Öğretisi','Ergun Candan','Sınır Ötesi','TÜRKİYE','978-975-8312-71-9','1.11.2019',24,'Ezoterizm / Gizli Bilimler','Türkçe','-',256,'25.07.2023','27.01.2026','Nilgün Baran',null,'19.09.2024',,'Gizli Öğretiler','Kadim gizli bilgiler, sembolizm'],[3,'Lemurya Yolu','Lauren O. Thyme & Sareya Orion','AKAŞA','TÜRKİYE','975-6793-58-9','1.01.2004',1,'Tarih / Uygarlıklar','Türkçe','Semra Ayanbaşı',184,'25.07.2023','27.01.2026','Nilgün Baran',null,'+',,'Antik Uygarlıklar','Sümerler, MU, Atlantis, Lemurya'],[4,'İlahi Nizam ve Kainat','Bedri Ruhselman','MTİAD1950','TÜRKİYE','978-605-63845-1-6','2019',10,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',319,'25.07.2023','25.01.2026','Nilgün Baran',null,'+',,'Kozmik Felsefe','Evrenin yapısı, varlık felsefesi'],[5,'Novus','Erhan Kolbaşı','CBN Yayıncılık','TÜRKİYE','978-605-88234-8-8','2018',1,'Ezoterizm / Gizli Bilimler','Türkçe','-',528,null,'21.11.2025','Başar Koçak',null,'+',,'Gizli Öğretiler','Kadim gizli bilgiler, sembolizm'],[6,'Asil Kan','Kazım Yurdakul','Akil Yayınları','TÜRKİYE','978-605-73410-3-7','2023',2,'Tarih / Uygarlıklar','Türkçe','-',348,null,'25.01.2026',null,null,null,,'Antik Uygarlıklar','Sümerler, MU, Atlantis, Lemurya'],[7,'Mutatio','Erhan Kolbaşı','Enstitü Yayınları','TÜRKİYE','978-605-86223-4-0','2020',1,'Dünya Dışı Temas / UFO','Türkçe','-',475,null,'29.01.2026',null,null,null,,'Galaktik İletişim','Uzay diplomasisi, kozmik mesajlar'],[8,'MESAJ Novus II','Erhan Kolbaşı','Destek Yayınları','TÜRKİYE','978-625-441-970-6','2023',1,'Dünya Dışı Temas / UFO','Türkçe','-',285,null,'29.01.2026',null,null,null,,'Galaktik İletişim','Uzay diplomasisi, kozmik mesajlar'],[9,'Kayıp Tanrılar Ülkesi','Ahmet Ümit','Yapı Kredi Yayınları','TÜRKİYE','978-975-08-5041-7','2021',1,'Roman','Türkçe','-',502,null,'25.01.2026',null,null,null,,'Polisiye / Gerilim','Suç, dedektiflik, gerilim romanları'],[10,'7 Akbaba','Tevfik Yener','Doğan Kitap','TÜRKİYE','978-605-111-377-7','2021',1,'Roman','Türkçe','-',338,null,'22.02.2026',null,null,null,,'Polisiye / Gerilim','Suç, dedektiflik, gerilim romanları'],[11,'Kayıp Kıta MU','James CHURCHWARD','Ege Meta Yayınarı','TÜRKİYE','975-8519-04-2','2000','?','Tarih / Uygarlıklar','Türkçe','Rengin EKİZ',401,null,'29.01.2026',null,null,null,,'Antik Uygarlıklar','Sümerler, MU, Atlantis, Lemurya'],[12,'Ölümsüz Üstatların Yaşam Ve Öğretisi (I)','Baird T. Spalding','Akaşa','TÜRKİYE','975-6793-39-2','2003',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',164,null,'29.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[13,'Ölümsüz Üstatların Yaşam Ve Öğretisi (II)','Baird T. Spalding','Akaşa','TÜRKİYE','975-6793-41-4','2006',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',159,null,'29.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[14,'Ölümsüz Üstatların Yaşam Ve Öğretisi (III)','Baird T. Spalding','Akaşa','TÜRKİYE','975-6793-43-0','2008',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',160,null,'29.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[15,'Kayıp Uygarlık ATLANTİS Hayatta Kalanlar','Frank Joseph','Dharma','TÜRKİYE','975-8729-85-3','2005',1,'Tarih / Uygarlıklar','Türkçe','Nur Nirven',336,null,'25.01.2026',null,null,null,,'Antik Uygarlıklar','Sümerler, MU, Atlantis, Lemurya'],[16,'ÜÇ CİSİM PROBLEMİ','Cixim Liu','İthaki','TÜRKİYE','978-605-375-499-2','2024',11,'Roman','Türkçe','Zeynep Özmeral',410,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[17,'Sahihi-i Buhari Cilt 1','İmam-i Buhari','Sabah','TÜRKİYE','—','1966',1,'Din / İnanç','Türkçe','Konyalı Mehmed Vehbi',295,null,'25.01.2026',null,null,null,,'Hadis','Hadis külliyatları, rivayetler'],[18,'Sahihi-i Buhari Cilt 2','İmam-i Buhari','Sabah','TÜRKİYE','—','1966',2,'Din / İnanç','Türkçe','Konyalı Mehmed Vehbi',292,null,'25.01.2026',null,null,null,,'Hadis','Hadis külliyatları, rivayetler'],[19,'Sahihi-i Buhari Cilt 3','İmam-i Buhari','Sabah','TÜRKİYE','—','1966',3,'Din / İnanç','Türkçe','Konyalı Mehmed Vehbi',240,null,'25.01.2026',null,null,null,,'Hadis','Hadis külliyatları, rivayetler'],[20,'Sahihi-i Buhari Cilt 4','İmam-i Buhari','Sabah','TÜRKİYE','—','1966',4,'Din / İnanç','Türkçe','Konyalı Mehmed Vehbi',311,null,'25.01.2026',null,null,null,,'Hadis','Hadis külliyatları, rivayetler'],[21,'Allahın Dini İslam\'a Son Davet KUR\'AN','Prof. Dr. Gazi Özdemir','Sirius Yayncılık','TÜRKİYE','978-605-4182-60-2','2020',6,'Din / İnanç','Türkçe','-',685,null,'25.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[22,'Yokuşta Yürüyen Adam','Şıhça Yavuz','Karınca Yayınları','TÜRKİYE','978-9944-62-862-4','2001',1,'Biyografi / Anı','Türkçe','-',408,null,'25.01.2026',null,null,null,,'Anı / Hatırat','Kişisel hatıralar, gözlemler'],[23,'Kabuğunu Kıran İnci','Nadia Hashimi','Arkadya Yayınları','TÜRKİYE','978-605-69556-0-0','2019',1,'Roman','Türkçe','Mehtap Gül Ayral',1,null,'25.01.2026',null,null,null,,'Aşk / Dram','Romantik ve duygusal romanlar'],[24,'Barış Sanatı AIKIDO','Morihei Ueshıba','Athica Yayınları','TÜRKİYE','978-625-94005-0-1','2023',1,'Kişisel Gelişim','Türkçe','Zeynep Bilgin',192,null,'25.01.2026',null,null,null,,'Felsefe / Yaşam Sanatı','Felsefi yaklaşımlar, yaşam bilgeliği'],[25,'Excel VBA Programlama','Faruk Çubukçu','Kodlab','TÜRKİYE','978-625-677-04-3','2024',1,'Eğitim / Referans','Türkçe','-',290,null,'25.01.2026',null,null,null,,'Programlama / Teknoloji','Yazılım, Excel VBA'],[26,'MUHAFIZLAR Kaçırılmaların Ötesi','Dolores Cannon','Onur Kitap','TÜRKİYE','978605-2141-91-5','2023',1,'Roman','Türkçe','Gül Osegueda',518,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[27,'Karanlık Orman 2. Kitap','Cixin Liu','Ithaki Yayınları','TÜRKİYE','978-605-375-892-1','2024',10,'Roman','Türkçe','Zeynep Özmeral',596,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[28,'Ölümün Sonu','Cixin Liu','Ithaki Yayınları','TÜRKİYE','978-625-7737-04-3','2024',6,'Roman','Türkçe','Burak Eren',782,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[29,'Aklın Varsa BESLENME','Dr Ahmet Çiçek','?','TÜRKİYE','978-625-00-8675-9','2023',7,'Sağlık / Yaşam','Türkçe','-',156,null,'25.01.2026',null,null,null,,'Beslenme','Sağlıklı beslenme, diyet'],[30,'NE RENK? Bilinçaltının Renk Haritası','Dr Ahmet Çiçek','?','TÜRKİYE','978-625-00-9548-5','2023',3,'Kişisel Gelişim','Türkçe','-',286,null,'25.01.2026',null,null,null,,'Psikoloji / Davranış','İnsan psikolojisi, alışkanlıklar'],[31,'Atatürk\'ün Sırrı ÖTÜKEN','Baran Aydın','Destek Yayınları','TÜRKİYE','978-625-441-193-193-9','2023',5,'Tarih / Uygarlıklar','Türkçe','-',258,null,'25.01.2026',null,null,null,,'Türk Tarihi','Osmanlı, Cumhuriyet, Atatürk dönemi'],[32,'Boyuttakiler','Erdinç Aymergen','Korkut Yayınları','TÜRKİYE','978-605-71551-3-9','2022',1,'Roman','Türkçe','-',128,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[33,'Olasılıksız','Adam Fewer','April','TÜRKİYE','978-975-6006-05-4','2019',94,'Roman','Türkçe','-',494,null,'25.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[34,'LONGMANS ENGLISH LAROUSSE','LONGMANS','Longmans','PARİS','—','1968',null,'Eğitim / Referans','İngilizce','-',null,null,null,null,null,null,,'Sözlük / Dil','Yabancı dil kaynakları'],[35,'Aşkın İstilası DEM (2)','Metin Hara','Destek Yayınları','TÜRKİYE','978-605-311-164-1','2019',68,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',488,null,'25.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[36,'Aşkın İstilası YOL (1)','Metin Hara','Destek Yayınları','TÜRKİYE','978-605-4994-52-6','01.09.2019',226,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',407,null,'28.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[37,'Anlayışın Kitabı','OSHO','Ganj Yayıncılık','TÜRKİYE','978-975-881-748-1','2016',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Sangeet & Nagehan Öztürk',379,null,'25.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[38,'Yüreğim Seni Çok Sevdi','Canan Tan','Altın Kitaplar','TÜRKİYE','978-975-21-0822-6','2007',4,'Roman','Türkçe','-',479,null,'25.01.2026',null,null,null,,'Aşk / Dram','Romantik ve duygusal romanlar'],[39,'Bir Kurbağa Gibi Sakin ve Dikkatli (CD\'li)','Elina Snel','Pegasus Yayınları','TÜRKİYE','978-605-343-524-2','2018',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Duygu Dalgakıran',143,null,'25.01.2026',null,null,null,,'Meditasyon / Farkındalık','Meditasyon teknikleri, iç huzur'],[40,'Kilit Taşı','Sema Soykan','Alfa','TÜRKİYE','978-625-449-559-5','2022',6,'Roman','Türkçe','-',389,null,'25.01.2026',null,null,null,,'Tarihi Roman','Geçmişte geçen kurgusal hikayeler'],[41,'AVA','Ayşegül Ilgaz','Destek Yayınları','TÜRKİYE','978-605-311-613-4','2019',1,'Roman','Türkçe','-',428,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[42,'Geçiş','Dilek Karakuş','Doğa Yayınları','TÜRKİYE','978-625-8004-03-8','2021',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',216,null,'29.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[43,'GELİBOLU','Erol Mütercimler','Alfa','TÜRKİYE','978-605-106-208-2','2010',11,'Tarih / Uygarlıklar','Türkçe','-',718,null,'29.01.2026',null,null,null,,'Siyasi Tarih','Siyasi olaylar, araştırmacı gazetecilik'],[44,'Kıyamet Alametleri','Ergun Candan','Sınır Ötesi','TÜRKİYE','975-8312-09-X','2002',4,'Ezoterizm / Gizli Bilimler','Türkçe','-',336,null,'25.01.2026',null,null,null,,'Gizli Öğretiler','Kadim gizli bilgiler, sembolizm'],[45,'Galaktik Diplomasi','Erhan Kolbaşı','Destek Yayınları','TÜRKİYE','978-605-311-169-6','2017',7,'Dünya Dışı Temas / UFO','Türkçe','-',375,null,'25.01.2026',null,null,null,,'Galaktik İletişim','Uzay diplomasisi, kozmik mesajlar'],[46,'Kozmik Dokunuş In Vitro','Erhan Kolbaşı','Destek Yayınları','TÜRKİYE','978-605-311-327-0','2018',4,'Dünya Dışı Temas / UFO','Türkçe','-',256,null,'25.01.2026',null,null,null,,'Galaktik İletişim','Uzay diplomasisi, kozmik mesajlar'],[47,'Ezoterizme Giriş','Ergun Candan','Sınır Ötesi','TÜRKİYE','978-975-8312-71-9.','2018',3,'Ezoterizm / Gizli Bilimler','Türkçe','-',380,null,'29.01.2026',null,null,null,,'Gizli Öğretiler','Kadim gizli bilgiler, sembolizm'],[48,'SADIKLAR PLANI TEBLİĞLERİ','Ergun Arıkdal','Enstitü Yayınları','TÜRKİYE','978-605-86223-5-7','2022',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',655,null,'25.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[49,'Astral Seyahat Teknikleri (CD)','Nusret Safa Yılmaz','META Yayınları','TÜRKİYE','978-975-8584-36-9','2012',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',204,null,'25.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[50,'Ruhsal Astroloji','Jan Spiller','AKAŞA','TÜRKİYE','975-6793-55-4','2006',3,'Ezoterizm / Gizli Bilimler','Türkçe','Semra Ayanbaşı & Ali Kılıçlıoğlu',624,null,'29.01.2026',null,null,null,,'Astroloji','Yıldız haritaları, burç analizleri'],[51,'Yüksek Bilinç Kılavuzu','Ken Keyes Jr.','AKAŞA','TÜRKİYE','975-6793-26-0','2001',3,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',226,null,'25.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[52,'Yasak Bilim','J. Douglas Kenyon','Klan','TÜRKİYE','978-605-5740-13-9','2010',1,'Ezoterizm / Gizli Bilimler','Türkçe','Demet Taşkan',432,null,'29.01.2026',null,null,null,,'Gizli Öğretiler','Kadim gizli bilgiler, sembolizm'],[53,'Kozmik Oyun','Stanislav Grof','Omega','TÜRKİYE','978-605-02-0326-4','2014',1,'Ezoterizm / Gizli Bilimler','Türkçe','Levent Kartal',272,null,'25.01.2026',null,null,null,,'Parapsikoloji','Bilinçdışı güçler, altıncı his'],[54,'Karma Bağından Özgürleşmek','Swami Rama','Okyanus','TÜRKİYE','975-7200-91-3','2002',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Nur Yener',86,null,'25.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[55,'SÜMERLER','Helmut Uhlig','Totem','TÜRKİYE','978-9944-33047-3','2019',2,'Tarih / Uygarlıklar','Türkçe','Nilgün Ersoy',248,null,'25.01.2026',null,null,null,,'Antik Uygarlıklar','Sümerler, MU, Atlantis, Lemurya'],[56,'FRATERNİS','Burak Eldem','İnkılap','TÜRKİYE','975-10-2439-0','2006',1,'Roman','Türkçe','-',640,null,'25.01.2026',null,null,null,,'Tarihi Roman','Geçmişte geçen kurgusal hikayeler'],[57,'Dinginliğin Gücü','Eckhart Tolle','AKAŞA','TÜRKİYE','975-6793-56-2','2007',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',120,null,'25.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[58,'Andromeda\'dan Gelen UFO','R.N.Hernandez, Wendelle C.Stevens','AKAŞA','TÜRKİYE','—','1992',1,'Dünya Dışı Temas / UFO','Türkçe','Rengin Özer',343,null,'25.01.2026',null,null,null,,'UFO / Uzaylı Teması','UFO görüntüleri, kaçırılma vakaları'],[59,'MEDİTASYON','James Hewitt','AKAŞA','TÜRKİYE','978-975-6793-27-5','2010',4,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Rezan Süer',167,null,'25.01.2026',null,null,null,,'Meditasyon / Farkındalık','Meditasyon teknikleri, iç huzur'],[60,'Dokuz Kehanet','James Redfield','Altın Kitaplar','TÜRKİYE','975-405-516-5','2007',6,'Ezoterizm / Gizli Bilimler','Türkçe','Oya Alpar',270,null,'25.01.2026',null,null,null,,'Gizli Öğretiler','Kadim gizli bilgiler, sembolizm'],[61,'İmparatorluk','Isaac Asimov','Altın Kitaplar','TÜRKİYE','—','1983',1,'Roman','Türkçe','Gönül Suveren',315,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[62,'Kurtarıcı','Isaac Asimov','Altın Kitaplar','TÜRKİYE','—','1986',1,'Roman','Türkçe','Gönül Suveren',376,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[63,'İmparatorluk Kurulurken','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-055-4','1988',1,'Roman','Türkçe','Gönül Suveren',364,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[64,'İntikam Tanriçası','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-169-0','1990',1,'Roman','Türkçe','Mehmet Harmancı',352,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[65,'Hedef Beyin','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-003-1','1988',1,'Roman','Türkçe','Gönül Suveren',384,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[66,'Bilinmeyen Tehlike','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-10-0407-1','1993',1,'Roman','Türkçe','Mehmet Harmancı',288,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[67,'Erişilmez İmparatorluk','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-398-7','1993',1,'Roman','Türkçe','Gönül Suveren',412,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[68,'Ben Robot','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-309-X','1992',1,'Roman','Türkçe','Gönül Suveren',224,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[69,'Asi Gezegen TYRANN','Isaac Asimov','Baskan','TÜRKİYE','—','1983',1,'Roman','Türkçe','Orhan Yüksel',240,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[70,'Evrenin Çanları','Isaac Asimov','Altın Kitaplar','TÜRKİYE','—','1985',1,'Roman','Türkçe','Gönül Suveren',304,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[71,'Jüpiteri Satıyorum','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-369-3','1992',1,'Roman','Türkçe','Gönül Suveren',203,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[72,'Melezler Venüste','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-442-8','1993',1,'Roman','Türkçe','Gönül Suveren',219,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[73,'Galaksi Şeytanları','Isaac Asimov','Altın Kitaplar','TÜRKİYE','975-405-257-3','1991',1,'Roman','Türkçe','Gönül Suveren',204,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[74,'MESAJ','Carl Sagan','İnkılap','TÜRKİYE','—','1987',1,'Dünya Dışı Temas / UFO','Türkçe','Mehmet Harmancı',499,null,'25.01.2026',null,null,null,,'Galaktik İletişim','Uzay diplomasisi, kozmik mesajlar'],[75,'The Book of M','Peng Shepherd','Mürekkep Divit','TÜRKİYE','978-605-7583-71-0','2019',1,'Roman','Türkçe','Melda Dinçel',448,null,'25.01.2026',null,null,null,,'Distopya / Ütopya','Gelecek toplum tasarımları'],[76,'OMNİ Yaradılışın Dört Prensibi','John L. Payne','AKAŞA','TÜRKİYE','975-6793-44-9','2007',3,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',256,null,'25.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[77,'Bermuda\'nın Sırrı MU\'da Saklı','Aslı Kamaz','Kitapyurdu','TÜRKİYE','978-975-44934-2-','2000',1,'Tarih / Uygarlıklar','Türkçe','-',109,null,'25.01.2026',null,null,null,,'Antik Uygarlıklar','Sümerler, MU, Atlantis, Lemurya'],[78,'Naves Atlantis','Aslı Kamaz','Kitapyurdu','TÜRKİYE','978-975-44901-9-0','2023',1,'Roman','Türkçe','-',272,null,'25.01.2026',null,null,null,,'Tarihi Roman','Geçmişte geçen kurgusal hikayeler'],[79,'BUĞRA','Hasan Atilla Uğur & Murat Balcı','Destek Yayınları','TÜRKİYE','978-625-6051-44-7','2024',1,'Roman','Türkçe','-',415,null,'25.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[80,'VAKIF','Isaac Asimov','İthaki','TÜRKİYE','978-605-375-737-5','2021',11,'Roman','Türkçe','Kemal Baran Özbek',300,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[81,'Vakıf İmparatorluk','Isaac Asimov','İthaki','TÜRKİYE','978-605-375-774-0','2021',6,'Roman','Türkçe','Sönmez Güven',285,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[82,'İkinci Vakıf','Isaac Asimov','İthaki','TÜRKİYE','978-605-375-798-6','2021',6,'Roman','Türkçe','Çiğdem Şafak',257,null,'29.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[83,'Vakıfın Sınırı','Isaac Asimov','İthaki','TÜRKİYE','978-625-7650-32-8','2021',2,'Roman','Türkçe','Ertuğrul Bilal',494,null,'25.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[84,'Vakıf İleri','Isaac Asimov','İthaki','TÜRKİYE','978-625-7442-01-5','2021',2,'Roman','Türkçe','Ertuğrul Bilal',482,null,'29.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[85,'Sırlar Kitabı','OSHO','Omega','TÜRKİYE','978-605-02-0460-5','2015',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Niran Elçi',1078,null,'29.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[86,'Tanrılar Okulu','Stefano Elio D\'Anna','ALTEO','TÜRKİYE','975-92340-4-1','2004',1,'Kişisel Gelişim','Türkçe','Şükrü Zafer Serinken',370,null,'25.01.2026',null,null,null,,'Felsefe / Yaşam Sanatı','Felsefi yaklaşımlar, yaşam bilgeliği'],[87,'Kirael Büyük Değişim','Fred Sterling','AKAŞA','TÜRKİYE','975-6793-67-1','2008',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',272,null,'25.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[88,'ICHING Dünyanın En Eski Fal Sisteminin Tarihi ve Kullanım Biçimi','Tom Riseman','Dharma','TÜRKİYE','975-7800-05-8','2004',2,'Ezoterizm / Gizli Bilimler','Türkçe','Ayşe Bali',192,null,'25.01.2026',null,null,null,,'Gizli İlimler','Fal, kehanet, eski bilimler'],[89,'MAJİ (Bilinçdışı Güç)','Roderich Feldes','Cep Kitapları','TÜRKİYE','975-480-020-X','1992',1,'Ezoterizm / Gizli Bilimler','Türkçe','Kayhan Şentin',194,null,'25.01.2026',null,null,null,,'Parapsikoloji','Bilinçdışı güçler, altıncı his'],[90,'The SECRET','Rhonda Byrne','Mia Yayınları','TÜRKİYE','—','2007',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Can Üstünuçar',198,null,'25.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[91,'Ben Enerjiyim','Chislaine D. Martel','Arion','TÜRKİYE','975-571-038-8','2004',4,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Arzu Ünal',205,null,'26.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[92,'Aydınlanma Fenomeni','Kiara Windrider','AKAŞA','TÜRKİYE','975-6793-67-8','2006',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',240,null,'26.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[93,'%100 Düşüne Gücü','Jack Ensıng Addington','AKAŞA','TÜRKİYE','975-6793-54-8','2006',5,'Kişisel Gelişim','Türkçe','Birol Çetinkaya',219,null,'26.01.2026',null,null,null,,'Başarı / Motivasyon','Hedef belirleme, öz disiplin'],[94,'Tibet\'in Gençlik Pınarı 1 Kitap','Peter Kelder','Nemesis','TÜRKİYE','978-605-9961-89-9','2015',2,'Sağlık / Yaşam','Türkçe','Eda Tevrizci',119,null,'26.01.2026',null,null,null,,'Zihin-Beden Bağlantısı','Hastalıkların zihinsel nedenleri'],[95,'Dört Anlaşma','Don Miguel Ruiz','...Ötesi','TÜRKİYE','975-8363-04-2','1999',1,'Kişisel Gelişim','Türkçe','Nil Gün',122,null,'26.01.2026',null,null,null,,'Felsefe / Yaşam Sanatı','Felsefi yaklaşımlar, yaşam bilgeliği'],[96,'Feng Shui','Richard Webster','Alfa','TÜRKİYE','975-297-124-5','2002',1,'Sağlık / Yaşam','Türkçe','Pınar Savaş',151,null,'26.01.2026',null,null,null,,'Alternatif Tıp','İyot tedavisi, doğal şifa'],[97,'Billy Finger\'in Ölümden Sonraki Hayatı','Annie Kagan','Koton Kitap','TÜRKİYE','978-605-65561-2-8','2015',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Ebru Sürmeli',163,null,'26.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[98,'Aura ve Çakra Kullanma Kılavuzu','Karla McLaren','Kuraldışı','TÜRKİYE','975-275-008-7','2004',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','İpek Van Den Born',281,null,'26.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[99,'Tüm Hastalıkların Zihinsel Nedenleri','Loise L. Hay','Akaşa','TÜRKİYE','978-975-6793-83-1','2016',7,'Sağlık / Yaşam','Türkçe','Semra Ayanbaşı',96,null,'26.01.2026',null,null,null,,'Zihin-Beden Bağlantısı','Hastalıkların zihinsel nedenleri'],[100,'SADIKLAR PLANI RUHSAL TEBLİĞLER','.','Ruh ve Madde','TÜRKİYE','975-8007-93-9','2002',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',733,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[101,'Yaratılış Sırrı','Tom Knox','Pegasus Yayınları','TÜRKİYE','978-605-4263-77-6','2017',3,'Roman','Türkçe','ÇiğdemÖztekin',526,null,'26.01.2026',null,null,null,,'Tarihi Roman','Geçmişte geçen kurgusal hikayeler'],[102,'KIYAM-ET İşaret I','Deniz Erten','Monakitap','TÜRKİYE','978-605-2182-33-8','2020',46,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',339,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[103,'Kozmik Okyanus','Burak Eldem','İnkılap','TÜRKİYE','978-975-10-3100-6','2011',1,'Dünya Dışı Temas / UFO','Türkçe','-',416,null,'26.01.2026',null,null,null,,'Galaktik İletişim','Uzay diplomasisi, kozmik mesajlar'],[104,'Günbatımı Fandango','Burak Eldem','İnkılap','TÜRKİYE','978-975-10-2640-8','2007',1,'Roman','Türkçe','-',536,null,'26.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[105,'BAK-ARA İşaret II','Deniz Erten','Monakitap','TÜRKİYE','978-605-2182-32-1','2020',28,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',456,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[106,'DUVAR','Ahmet Şık,Bahadır Özgür, Ertuğrul Mavioğlu, Hakkı Özdal, Timur Soykan','İlerikitaplığı','TÜRKİYE','978-605-70702-3-4','2021',1,'Tarih / Uygarlıklar','Türkçe','-',517,null,'26.01.2026',null,null,null,,'Siyasi Tarih','Siyasi olaylar, araştırmacı gazetecilik'],[107,'Anastasya Çınlayan Sedir 1','Vladimir Megre','Kuraldışı','TÜRKİYE','978-975-275-108-8','2008',1,'Roman','Türkçe','Koray Karasulu',213,null,'26.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[108,'PARAPSİKOLOJİ','Werner Keller','Yılmaz','TÜRKİYE','—','1990',3,'Ezoterizm / Gizli Bilimler','Türkçe','Esat Nermi',359,null,'26.01.2026',null,null,null,,'Parapsikoloji','Bilinçdışı güçler, altıncı his'],[109,'Ölümden Sonra Yeniden Doğuş','J. B. Delaccour','Nebioğlu','TÜRKİYE','—','1974',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Gülin Çelik',208,null,'26.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[110,'AURA Şifa Kitabı','Walter Lübeck','Omega','TÜRKİYE','975-468-527-4','2005',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Özlem Özlen',232,null,'26.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[111,'Ölümden Sonra Neler Oluyor','Ergun Candan','Sınır Ötesi','TÜRKİYE','978-975-8312-37-5','2010',3,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',235,null,'26.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[112,'RA Bilgileri 2','Elkins, Rueckert, McCarty','Akaşa','TÜRKİYE','—','1993',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Rengin Özer',184,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[113,'Kaderin Pin Kodu','Douglas Forbes','Zer','TÜRKİYE','978-605-88996-0-5','2010',2,'Ezoterizm / Gizli Bilimler','Türkçe','Cem Şen',263,null,'26.01.2026',null,null,null,,'Astroloji','Yıldız haritaları, burç analizleri'],[114,'RA Bilgileri','Elkins, Rueckert, McCarty','Akaşa','TÜRKİYE','—','1994',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Rengin Özer',326,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[115,'Ra Bilgileri 3','Elkins, Rueckert, McCarty','Akaşa','TÜRKİYE','—','1993',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Rengin Özer',254,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[116,'Ra Bilgileri 4','Elkins, Rueckert, McCarty','Akaşa','TÜRKİYE','—','1994',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Rengin Özer',263,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[117,'Kryon Bitiş Zamanı (1)','Lee carrol','Akaşa','TÜRKİYE','975-6793-42-2','2005',4,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',187,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[118,'RAMTHA (Beyaz Ktap)','.','AKAŞA','TÜRKİYE','—','2003',2,'Ezoterizm / Gizli Bilimler','Türkçe','Semra Ayanbaşı',296,null,'26.01.2026',null,null,null,,'Parapsikoloji','Bilinçdışı güçler, altıncı his'],[119,'Kryon Yuvadan Mektuplar (5)','Lee carrol','AKAŞA','TÜRKİYE','975-6793-25-2','2002',2,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Semra Ayanbaşı',468,null,'26.01.2026',null,null,null,,'Channeling / Tebliğ','Ruhsal varlıklardan gelen mesajlar'],[120,'Yaşama ve Ölme Sanatı','OSHO','Butik Yayıncılık','TÜRKİYE','978-605-5154-58-5','—',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','Mareechi Asu',299,null,'26.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[121,'Altın Kitabın Sırları','Nevşah','Destek Yayınları','TÜRKİYE','978-605-311-038-5','2025',5,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',326,null,'26.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[122,'Amerika\'nın Uzay Sırları','Ali Bektan','Bilge Karınca','TÜRKİYE','975-8715-65-8','2006',1,'Dünya Dışı Temas / UFO','Türkçe','-',299,null,'26.01.2026',null,null,null,,'UFO / Uzaylı Teması','UFO görüntüleri, kaçırılma vakaları'],[123,'Çınlayan Sedir 2','Vladimir Megre','Kuraldışı','TÜRKİYE','978-975-275-114-9','2008',1,'Roman','Türkçe','Koray Karasulu',220,null,'26.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[124,'Ki Enerjisi','Koichi Tohel','Okyanus','TÜRKİYE','975-7200-64-6','2000',1,'Kişisel Gelişim','Türkçe','Selim Yeniçeri',111,null,'26.01.2026',null,null,null,,'Felsefe / Yaşam Sanatı','Felsefi yaklaşımlar, yaşam bilgeliği'],[125,'İnsanın Evreni ve Evrimi','Feridun Tepeköy','.','TÜRKİYE','—','1987',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',206,null,'26.01.2026',null,null,null,,'Bilinç / Uyanış','Yüksek bilinç, aydınlanma'],[126,'Gizli İlimler Hazinesi 1-2-3-4-5','Mustafa İloğlu (Derleyen)','.','TÜRKİYE','—','—',1,'Din / İnanç','Türkçe','-',0,null,'29.01.2026',null,null,null,,'Gizli İlimler','Fal, kehanet, eski bilimler'],[127,'Gizli İlimler Hazinesi 6-7-8','Mustafa İloğlu (Derleyen)','.','TÜRKİYE','—','1985',1,'Din / İnanç','Türkçe','-',0,null,'29.01.2026',null,null,null,,'Gizli İlimler','Fal, kehanet, eski bilimler'],[128,'Oliver Twist','Charles Dickens','Hayat','TÜRKİYE','—','1968',1,'Roman','Türkçe','Nihal Önal',382,null,'26.01.2026',null,null,null,,'Klasik Edebiyat','Dünya ve Türk edebiyatı klasikleri'],[129,'Dorian Gray\'in Portresi','Oscar Wilde','Hayat','TÜRKİYE','—','1971',1,'Roman','Türkçe','Vahdet Gültekin',288,null,'26.01.2026',null,null,null,,'Klasik Edebiyat','Dünya ve Türk edebiyatı klasikleri'],[130,'Ana Dilde İbadet','Yaşar Nuri Öztürk','Yeni Boyut','TÜRKİYE','975-6779-38-1','2002',6,'Din / İnanç','Türkçe','-',178,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[131,'Arif İçin Din Yoktur','Muhyiddin İbn-İ Arabi','Sınır Ötesi','TÜRKİYE','978-975-8312-68-9','2012',1,'Din / İnanç','Türkçe','Kevser Yeşiltaş',270,null,'26.01.2026',null,null,null,,'Din Eleştirisi / Sosyoloji','Dinin toplumsal analizi'],[132,'Allah Devletinde Demokrasi','Faik Bulut','Tüm zamanlar','TÜRKİYE','975-7350-10-9','1993',3,'Tarih / Uygarlıklar','Türkçe','-',424,null,'26.01.2026',null,null,null,,'Siyasi Tarih','Siyasi olaylar, araştırmacı gazetecilik'],[133,'Kur\'an-ı Kerim Meali','Yaşar Nuri Öztürk','Yeni Boyut','TÜRKİYE','—','1997',1,'Din / İnanç','Türkçe','-',632,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[134,'Babalar ve Oğullar','Ivan Turgenyev','Hayat','TÜRKİYE','—','1971',1,'Roman','Türkçe','Leyla Soykut',373,null,'26.01.2026',null,null,null,,'Klasik Edebiyat','Dünya ve Türk edebiyatı klasikleri'],[135,'Kur\'an-ı Kerim Tefsiri 1','Süleyman Ateş','Milliyet','TÜRKİYE','—','1995',1,'Din / İnanç','Türkçe','-',0,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[136,'Kur\'an-ı Kerim Tefsiri 2','Süleyman Ateş','Milliyet','TÜRKİYE','—','1995',2,'Din / İnanç','Türkçe','-',0,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[137,'Kur\'an-ı Kerim Tefsiri 3','Süleyman Ateş','Milliyet','TÜRKİYE','—','1995',3,'Din / İnanç','Türkçe','-',0,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[138,'Kur\'an-ı Kerim Tefsiri 4','Süleyman Ateş','Milliyet','TÜRKİYE','—','1995',4,'Din / İnanç','Türkçe','-',0,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[139,'Kur\'an-ı Kerim Tefsiri 5','Süleyman Ateş','Milliyet','TÜRKİYE','—','1995',5,'Din / İnanç','Türkçe','-',0,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[140,'Kur\'an-ı Kerim Tefsiri 6','Süleyman Ateş','Milliyet','TÜRKİYE','—','1995',6,'Din / İnanç','Türkçe','-',0,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[141,'Kur\'an-ı Kerim ve Yüce Meali','Abdullah Aydın','Seda Yayınları','TÜRKİYE','—','2004',1,'Din / İnanç','Türkçe','-',644,null,'26.01.2026',null,null,null,,'Kur\'an Araştırması','Tefsir, meal, Kur\'an çalışmaları'],[142,'Yeni Mesnevi 1','Necla Çarpan','.','TÜRKİYE','—','1966',1,'Din / İnanç','Türkçe','-',185,null,'26.01.2026',null,null,null,,'Tasavvuf','Tasavvufi düşünce, mesnevi'],[143,'Yeni Mesnevi 2','Necla Çarpan','.','TÜRKİYE','—','1966',1,'Din / İnanç','Türkçe','-',117,null,'26.01.2026',null,null,null,,'Tasavvuf','Tasavvufi düşünce, mesnevi'],[144,'DİRİLİŞ','Lev Tolstoy','Güven Yayınevi','TÜRKİYE','—','1970',4,'Roman','Türkçe','Samih Tiryakioğlu',430,null,'26.01.2026',null,null,null,,'Klasik Edebiyat','Dünya ve Türk edebiyatı klasikleri'],[145,'Kara Kutu (Yüzleşme Vakti)','Soner Yalçın','Kırmızı Kedi','TÜRKİYE','978-605-298-568-7','2019',1,'Tarih / Uygarlıklar','Türkçe','-',575,null,'26.01.2026',null,null,null,,'Siyasi Tarih','Siyasi olaylar, araştırmacı gazetecilik'],[146,'Mesih Klonu','Aşkın Güngör','İnkılap','TÜRKİYE','978-975-10-2632-3','2007',1,'Roman','Türkçe','-',519,null,'26.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[147,'Batıdan Gelen İblis','Paul Doherty','Martı','TÜRKİYE','978-605-4335-32-9','2010',1,'Roman','Türkçe','E. Özlem Gültekin',648,null,'26.01.2026',null,null,null,,'Tarihi Roman','Geçmişte geçen kurgusal hikayeler'],[148,'Ne Yediğinizi Biliyor Musunuz','Musa Özsoy','Cezve Kitap','TÜRKİYE','978-605-2297-64-3','2020',1,'Yemek / Gastronomi','Türkçe','-',213,null,'26.01.2026',null,null,null,,'Mutfak / Lezzet','Yemek kültürü, tarifler'],[149,'EON An Epic of The Future','Greg Bear','A Bluejay Book','ABD','—','1985',1,'Roman','İngilizce','-',436,null,'26.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[150,'Close Encounters of The Fourth Kind','C.D.B. BRYAN','Alfred A. Knopf','ABD','0-679-42975-1','1995',1,'Dünya Dışı Temas / UFO','İngilizce',null,476,null,'26.01.2026',null,null,null,,'UFO / Uzaylı Teması','UFO görüntüleri, kaçırılma vakaları'],[151,'Işığın Elleri','Barbara Ann Brennan','META','TÜRKİYE','975-8584-01-4','2004',3,'Sağlık / Yaşam','Türkçe','Aylin Çevik',287,null,'26.01.2026',null,null,null,,'Alternatif Tıp','İyot tedavisi, doğal şifa'],[152,'How To Restore & Repair Practically Everything','Lorraine Johnson','Penguin','İngiltere','0-7181-3044-8','1995',6,'Eğitim / Referans','İngilizce','-',188,null,'26.01.2026',null,null,null,,'Hayatta Kalma / Pratik','Bakım-onarım, outdoor rehber'],[153,'The GAMES Treasury','Merilyn Simonds Mohr','Chapters','Kanada','1-881527-23-9','1993',1,'Hikaye / Kısa Yazı','İngilizce','-',351,null,'26.01.2026',null,null,null,,'Hikaye','Kısa öyküler, denemeler'],[154,'Outdoor Survival Guide (Copy)','Hugh McManners','Dorling Kindersley','İngiltere','0-7513-0644-4','1995',1,'Eğitim / Referans','İngilizce','-',192,null,'26.01.2026',null,null,null,,'Hayatta Kalma / Pratik','Bakım-onarım, outdoor rehber'],[155,'Marshmallow Testi','Walter Mischel','Pegasus','Türkiye','978-605-299-041-4','1.12.16',1,'Kişisel Gelişim','Türkçe','Barış Satılmış',342,'28.01.2026','28.01.2026',null,null,null,,'Psikoloji / Davranış','İnsan psikolojisi, alışkanlıklar'],[156,'Kral Kaybederse','Gülseren Budayıcıoğlu','Remzi Kitabevi','Türkiye','978-975-14-1657-5','01.02.20',23,'Roman','Türkçe','-',384,'28.01.2026','28.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[157,'İçindeki Çocuk Bir Yuva Bulmalı','Stefanie Stahl','Pegasus','Türkiye','978-605-299-591-4','01.12.2018',1,'Kişisel Gelişim','Türkçe','Azra Herrscher',255,'28.01.2026','28.01.2026',null,null,null,,'Çocuk Eğitimi / Aile','Ebeveynlik, çocuk gelişimi'],[158,'Issız Kadınlar Sokağı','Canan Tan','Doğan Kitap','Türkiye','978-605-09-5433-3','2019',1,'Roman','Türkçe','-',134,'28.01.2026','28.01.2026',null,null,null,,'Aşk / Dram','Romantik ve duygusal romanlar'],[159,'Gelecek Sizin','E.Armağan Karakaş - Yağmur Karakaş','Gün Yayıncılık','Türkiye','978-605-4540-74-7','01.02.2021',1,'Kişisel Gelişim','Türkçe','-',159,'28.01.2026','28.01.2026',null,null,null,,'Başarı / Motivasyon','Hedef belirleme, öz disiplin'],[160,'Akıllandım Artık Şimdi Daha Deliyim','Nigün Bodur','Destek','Türkiye','978-605-311-819-0','1.4.2020',1,'Kişisel Gelişim','Türkçe','-',215,'28.01.2026','28.01.2026',null,null,null,,'Başarı / Motivasyon','Hedef belirleme, öz disiplin'],[161,'TOPRAK','Buket Uzuner','Everest','Türkiye','978-605-141-853-7','01.05.2015',3,'Roman','Türkçe','-',558,'28.01.2026','28.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[162,'Balıkçı ve Oğlu','Ömer Zülfü Livaneli','İnkilap','Türkiye','978-975-10-4212-5','2021',1,'Roman','Türkçe','-',135,'28.01.2026','22.02.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[163,'100 Türk Büyüğü','Sadi Borak','Hürriyet','Türkiye','—','-',1,'Tarih / Uygarlıklar','Türkçe','-',118,'28.01.2026','28.01.2026',null,null,null,,'Türk Tarihi','Osmanlı, Cumhuriyet, Atatürk dönemi'],[164,'Başarıya Götüren Aile','Doğan Cüceloğlu','Remzi Kitabevi','Türkiye','975-14-1107-6','01.03.06',1,'Kişisel Gelişim','Türkçe','-',138,'28.01.2026','28.01.2026',null,null,null,,'Çocuk Eğitimi / Aile','Ebeveynlik, çocuk gelişimi'],[165,'Kuantum Beslenme','Ayşegül Çoruhlu','Doğan Kitap','Türkiye','978-605-09-5897-3','1.2.19',1,'Sağlık / Yaşam','Türkçe','-',200,'28.01.2026','28.01.2026',null,null,null,,'Beslenme','Sağlıklı beslenme, diyet'],[166,'İyiliğin Bilim Hali','Metin Hara','Destek','Türkiye','978-605-311-388-1','1.3.18',2,'Kişisel Gelişim','Türkçe','-',248,'28.01.2026','28.01.2026',null,null,null,,'Felsefe / Yaşam Sanatı','Felsefi yaklaşımlar, yaşam bilgeliği'],[167,'İyiliğin Hareket Hali','Metin Hara','Destek','Türkiye','978-605-311-389-8','1.3.18',1,'Kişisel Gelişim','Türkçe','-',247,'28.01.2026','28.01.2026',null,null,null,,'Felsefe / Yaşam Sanatı','Felsefi yaklaşımlar, yaşam bilgeliği'],[168,'İçindeki Gücün Sırrını Keşfet','Nuray Sayarı','Destek','Türkiye','978-9944-298-81-0','1.4.12',40,'Kişisel Gelişim','Türkçe','-',205,'28.01.2026','28.01.2026',null,null,null,,'Başarı / Motivasyon','Hedef belirleme, öz disiplin'],[169,'Seni Feda Etmeyeceğim','Nihan Kaya','Eksik Parça','Türkiye','978-625-7371-10-0','1.6.21',2,'Roman','Türkçe','-',153,'28.01.2026','28.01.2026',null,null,null,,'Aşk / Dram','Romantik ve duygusal romanlar'],[170,'İyot Giren Eve Doktor Girmez','Hasan Hüsnü Eren','Hayykitap','Türkiye','978-625-6329-11-9','1.8.24',1,'Sağlık / Yaşam','Türkçe','-',312,'28.01.2026','28.01.2026',null,null,null,,'Alternatif Tıp','İyot tedavisi, doğal şifa'],[171,'İpek Sabahlık','Osman Balcıgil','Destek','Türkiye','978-605-311-295-2','1.11.22',39,'Roman','Türkçe','-',432,'28.01.2026','28.01.2026',null,null,null,,'Aşk / Dram','Romantik ve duygusal romanlar'],[172,'Benim Lokantalarım','Artun Ünsal','Yapı Kredi','Türkiye','978-975-363-509-5','01.07.1996',1,'Yemek / Gastronomi','Türkçe','-',543,'28.01.2026','28.01.2026',null,null,null,,'Mutfak / Lezzet','Yemek kültürü, tarifler'],[173,'Ve Dağlar Yankılandı','Khaled Hosseini','Everest','Türkiye','978-605-141-677-9','01.09.2013',1,'Roman','Türkçe','Püren Özgören',410,'28.01.2026','28.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[174,'Üç Kız Kardeş','İclal Aydın','Artemis','Türkiye','978-605-304-324-9','1.3.18',20,'Roman','Türkçe','-',366,'28.01.2026','28.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[175,'Gör Beni','Azra Kohen','Everest','Türkiye','978-605-185-363-5','1.1.19',2,'Roman','Türkçe','-',576,'28.01.2026','28.01.2026',null,null,null,,'Tarihi Roman','Geçmişte geçen kurgusal hikayeler'],[176,'Vakıf ve Dünya','Isaac Asimov','İnkılap Kitabevi','Türkiye','—','1.1.88',1,'Roman','Türkçe','Metin Yurtbaşı',480,'28.01.2026','28.01.2026',null,null,null,,'Bilim Kurgu','Gelecek, uzay, teknoloji temalı kurgular'],[177,'Temel Fotoğraf Semineri Ders Notları','Ufuk M.Duygun','İfsak','Türkiye','975-95965-5-5','1.6.15',14,'Eğitim / Referans','Türkçe','-',96,'28.01.2026','28.01.2026',null,null,null,,'Fotoğrafçılık','Fotoğraf teknikleri'],[178,'Nükleer Felaketlerle Yaşamak','Angelika Claussen / Alex Rosen','Yeni İnsan','Türkiye','978-605-5895-84-6','1.4.16',1,'Sağlık / Yaşam','Türkçe','Alper Öktem',160,'28.01.2026','28.01.2026',null,null,null,,'Alternatif Tıp','İyot tedavisi, doğal şifa'],[179,'Haliç\'te Yaşayan Simonlar','Hanefi Avcı','Angora','Türkiye','978-975-287-075-8','01.01.2010',4,'Tarih / Uygarlıklar','Türkçe','-',597,'28.01.2026','28.01.2026',null,null,null,,'Siyasi Tarih','Siyasi olaylar, araştırmacı gazetecilik'],[180,'Mucize','R.J.Palacio','Pegasus','Türkiye','978-605-343-745-1','1.10.17',5,'Roman','Türkçe','Berna Sirman',334,'28.01.2026','28.01.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[181,'Ölümden Sonra','Erhan Kolbaşı - Dilek Kesen','Üçüncü Göz','Türkiye','978-625-95942-3-1','01.01.2025',1,'Spiritüalizm / Ruhsal Gelişim','Türkçe','-',369,'29.01.2026','29.01.2026',null,null,null,,'Ruhsal Yolculuk','Ölümden sonra yaşam, reenkarnasyon'],[182,'Adsız Roman','Sema Soykan','Alfa','Türkiye','978-605-171-855-2','01.06.2022',10,'Roman','Türkçe','-',315,'22.02.2026','22.02.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı'],[183,'Kardeşimin Hikayesi','Ömer Zülfü Livaneli','Doğan Kitap','Türkiye','978-605-09-1444-3','01.06.2013',75,'Roman','Türkçe','-',324,'22.02.2026','22.02.2026',null,null,null,,'Güncel Edebiyat','Modern Türk ve dünya edebiyatı']]
 
-let books=RAW.map(r=>({id:r[0],baslik:r[1]||'',yazar:r[2]||'',yayimci:r[3]||'',yayimYeri:r[4]||'',isbn:r[5]||'',basimTarihi:r[6]||'',baski:r[7]!=null?String(r[7]):'',kategori:r[8]||'',altKategori:r[18]||'',aciklama:r[19]||'',dil:r[9]||'',cevirmen:r[10]||'',sayfa:r[11],kayitTar:r[12]||'',guncelTar:r[13]||'',verilen:r[14]||'',verTar:r[15]||'',iadeTar:r[16]||'',foto:''}));
+let books=[]; // Kitaplar yalnızca kullanıcının kendi OneDrive Excel dosyasından (ve yerel önbellekten) gelir
 (()=>{try{const s=JSON.parse(localStorage.getItem('kys4')||'null');if(s&&s.length)books=s;}catch(e){}})();
 let filtered=[],selId=null,sCol='id',sDir=1,nId=Math.max((parseInt(localStorage.getItem('kys4_lastId')||'0')||0),Math.max(0,...books.map(b=>b.id)))+1,tmpFoto=null;
 const save=()=>{try{localStorage.setItem('kys4',JSON.stringify(books));}catch(e){}};
@@ -440,6 +476,7 @@ function saveCfg() {
   OD_SHEET = document.getElementById('cfgSheet').value.trim() || 'Data';
   OD_PHOTOS_PATH = (document.getElementById('cfgPhotosPath') || {value:''}).value.trim() || 'Kitap Listesi/VBA/Kitap Listesi/Fotoğraf';
   localStorage.setItem('od_clientId', OD_CLIENT_ID);
+  if (localStorage.getItem('od_fileName') !== OD_FILE_NAME) localStorage.removeItem('od_fileId');
   localStorage.setItem('od_fileName', OD_FILE_NAME);
   localStorage.setItem('od_sheet', OD_SHEET);
   localStorage.setItem('od_photosPath', OD_PHOTOS_PATH);
@@ -524,8 +561,15 @@ async function connectToOneDrive() {
   setOdStatus(`🔄 OneDrive'a bağlanıyor...`, 'info');
   try {
     const token = await getToken();
-    // Önce doğrudan kök yoldan dene
     let odFileId_local = null;
+    // 0) Kurulumda seçilen dosyanın kimliği kayıtlıysa onu kullan
+    const savedFileId = localStorage.getItem('od_fileId');
+    if (savedFileId) {
+      const resId = await fetch(`${GRAPH}/me/drive/items/${savedFileId}?$select=id,name`, { headers: { Authorization: `Bearer ${token}` }});
+      if (resId.ok) { const j = await resId.json(); if (j.id) odFileId_local = j.id; }
+    }
+    // Önce doğrudan kök yoldan dene
+    if (!odFileId_local) {
     const resPath = await fetch(
       `${GRAPH}/me/drive/root:/${encodeURIComponent(OD_FILE_NAME)}`,
       { headers: { Authorization: `Bearer ${token}` }}
@@ -533,6 +577,7 @@ async function connectToOneDrive() {
     if (resPath.ok) {
       const filePath = await resPath.json();
       if (filePath.id) odFileId_local = filePath.id;
+    }
     }
     // Bulunamazsa arama API'si ile dene
     if (!odFileId_local) {
@@ -545,10 +590,18 @@ async function connectToOneDrive() {
       if (file) odFileId_local = file.id;
     }
     if (!odFileId_local) {
-      setOdStatus(`⚠️ "${OD_FILE_NAME}" OneDrive'da bulunamadı. Dosyanın OneDrive kökünde veya alt klasörde .xlsx olarak bulunduğundan emin olun.`, 'warn');
-      setSpin(false); return;
+      // İlk kurulum: Excel dosyasının yerini kullanıcıya sor
+      setSpin(false);
+      setOdStatus(`📁 Kitap listesi Excel dosyası seçilmedi — klasörünü seçin`, 'warn');
+      openPicker();
+      return;
     }
     odFileId = odFileId_local;
+    localStorage.setItem('od_fileId', odFileId);
+    if (!localStorage.getItem('kys4_setupDone')) {
+      try { await ensureSheetAndHeaders(token); } catch(e) { console.warn('Sayfa/başlık kontrolü:', e); }
+      localStorage.setItem('kys4_setupDone', '1');
+    }
     await readFromExcel(token);
     await loadPhotoIndex(token);   // OneDrive photos/ klasörünü tara
     setOdUI(true);
@@ -572,7 +625,14 @@ async function readFromExcel(token) {
     }
     const data = await res.json();
     const rows = data.values || [];
-    if (rows.length < 2) { setOdStatus(`⚠️ Excel verisi boş`, 'warn'); setSpin(false); return; }
+    if (rows.length < 2) {
+      // Excel'de henüz kitap yok → listeyi boşalt (yeni kullanıcı)
+      books = [];
+      nId = Math.max(parseInt(localStorage.getItem('kys4_lastId') || '0') || 0, 1);
+      save(); doSearch();
+      setOdStatus(`✅ ${odAccount?.name || ''} — liste boş, ilk kitabınızı ekleyebilirsiniz`, 'ok');
+      setSpin(false); return;
+    }
 
 
     // Excel seri tarihini GG.AA.YYYY formatına çevirir
@@ -743,34 +803,31 @@ async function loadPhotoIndex(token) {
         const pathData = await pathRes.json();
         photosFolderId = pathData.id;
       } else {
-        // Yol bulunamadı — alternatif: arama yöntemi
-        const pathErr = await pathRes.json();
+        // Yol bulunamadı — Excel dosyasının yanındaki klasöre bakılacak
+        const pathErr = await pathRes.json().catch(() => ({}));
         console.warn('Fotoğraf klasörü yolu bulunamadı:', pathErr.error?.message);
-        // Search by folder name as fallback
-        const folderName = OD_PHOTOS_PATH.split('/').pop().trim();
-        const searchRes = await fetch(
-          `${GRAPH}/me/drive/root/search(q='${encodeURIComponent(folderName)}')`,
-          { headers: { Authorization: `Bearer ${t}` }}
-        );
-        const searchData = await searchRes.json();
-        const found = (searchData.value||[]).find(i => i.folder && i.name === folderName);
-        if (found) photosFolderId = found.id;
       }
     }
 
     if (!photosFolderId) {
-      // Son çare: Excel'in yanındaki "photos" klasörüne bak
-      const fileRes = await fetch(`${GRAPH}/me/drive/items/${odFileId}`, { headers: { Authorization: `Bearer ${t}` }});
+      // Excel'in yanındaki "Fotoğraf" (veya eski "photos") klasörü; yoksa otomatik oluştur
+      const fileRes = await fetch(`${GRAPH}/me/drive/items/${odFileId}?$select=id,parentReference`, { headers: { Authorization: `Bearer ${t}` }});
       const fileData = await fileRes.json();
       const parentId = fileData.parentReference?.id;
       if (parentId) {
         const chRes = await fetch(
-          `${GRAPH}/me/drive/items/${parentId}/children?$filter=name eq 'photos'`,
+          `${GRAPH}/me/drive/items/${parentId}/children?$select=id,name,folder&$top=999`,
           { headers: { Authorization: `Bearer ${t}` }}
         );
         const chData = await chRes.json();
-        const fallback = (chData.value||[]).find(i => i.folder);
-        if (fallback) photosFolderId = fallback.id;
+        const sib = (chData.value||[]).find(i => i.folder && (i.name === PHOTO_FOLDER_NAME || i.name === 'photos'));
+        const folderName = sib ? sib.name : PHOTO_FOLDER_NAME;
+        photosFolderId = sib ? sib.id : await ensureFolder(parentId, PHOTO_FOLDER_NAME, t);
+        if (photosFolderId) {
+          const parentPath = decodeURIComponent((fileData.parentReference.path || '').replace(/^\/drive\/root:\/?/, ''));
+          OD_PHOTOS_PATH = (parentPath ? parentPath + '/' : '') + folderName;
+          localStorage.setItem('od_photosPath', OD_PHOTOS_PATH);
+        }
       }
     }
 
@@ -815,6 +872,192 @@ async function loadPhotoIndex(token) {
     setSpin(false);
     setOdStatus(`✅ Bağlı — ${books.length} kitap ⚠️ Fotoğraf yüklenemedi: ${e.message||e}`, 'warn');
   }
+}
+
+// ══════════════════════════════════════════════════
+//  İLK KURULUM SİHİRBAZI (yeni kullanıcı)
+// ══════════════════════════════════════════════════
+// Boş kitap listesi şablonu (Data sayfası + başlık satırı)
+const TEMPLATE_XLSX_B64 = 'UEsDBBQAAAAIAJN+eV1Gx01IlwAAAM0AAAAQAAAAZG9jUHJvcHMvYXBwLnhtbE2PTQvCMBBE/0ro3aS16EFiQdSj6Ml7TDc2kGSXZIX476WCH7cZhvdg9CUjQWYPRdQYUtk2EzNtlCp2gmiKRIJUY3CYo+EiMd8VOuctHNA+IiRWy7ZdK6gMaYRxQV9hM+gdUfDWsMc0nLzNWNCxOFYLQewxkmF/CyCUOBMketYgetnJlVb/4Gy5Qi5z7mX3Hj9dq9+B4QVQSwMEFAAAAAgAk355XdFYCujvAAAAKwIAABEAAABkb2NQcm9wcy9jb3JlLnhtbM2SQWrDMBBFrxK0t0eSSSjC8SalqxYKDbR0J6RJImpZQppi5/bFauJQ2gN0O/N5/w1Ma6IyIeFzChETOcyryfdDViZu2YkoKoBsTuh1rkPEYfL9ISSvKdchHSFq86GPCJLzDXgkbTVpmIFVXIisa61RJqGmkC54axZ8/Ex9gVkD2KPHgTKIWgDr5sZ4nvoWboAZRph8/h6gXYhl+ie2bIBdklN2S2ocx3psSk5yLuDt6fGlnFu5IZMeDLLVlJ2ic8Qtuza/Nrv7/QPrJJebSohKrvdCqrVUzd377PrD7ybsg3UH94+Nr4JdC7/+ovsCUEsDBBQAAAAIAJN+eV2ZXJwjDwYAAJwnAAATAAAAeGwvdGhlbWUvdGhlbWUxLnhtbO1aXXObOBR9z6/QaGf2bWsw4NhpSCf+anebtJnE250+XmMZ1AiJEXIS//sdge0gwNjtOpt0N34IQdI5956rK12EffruIWbojsiUCu5j+42F350dncKJikhM0EPMeHoCPo6USk5arTSISAzpG5EQ/hCzuZAxqPSNkGFrJuGe8jBmrbZldVoxUI4Rh5j4+PN8TgOCJpoSnx0htOYfMRITrlLdlrUGTN4EmeUiEuf92YjZrb2+y+7TZTpgEt0B8/E95TNxPyEPCiMGqRow6WMr++DWhqNlkJzCCVO7KAt04+xj0hUIMg/bJp0Mpxs+e+z2jodlb9qGNw3w0Wg0GNll60U4BAHhZUFFCnfctfslD0qgDU2DJwPLs9xamqo3znaaXr/f93p1NE6Fxt1O07U67nm7jsat0HgNsemfDwadOhqvQtPZTjM+7nXcWppOgSZilN9uJ9FZW040A3IKJ3PBPjSzdC3L6pay30Tpls2y2yzEueBqx0qM4ZuQY8GVYZ2BohypZULmEBAfDyCeSgqPHmSjCBSGlPqCdHufdgulgaSJ8vEfCXBcGPvrLw/jcXv4Nrs6zluU/2PpBsfqu6vrcX4dOPn1fPy2ycgH4GHJSL83tDV2cOxamZHzwSgz0vdsbxdZWiLz+t2+xrpjz9mFVSVsx+tndo+HuchOxxrpa+986DZynUuYFrkmNCYp+kTu0bWIgTe6QabyB6GTCKgBhUjE5cwwECMVGYhPS2CNgD4xZ+uLpHzWiHi/+GbouYnkQtEmxMcoNhCXQrC+kM3aP2o3itoXPNzhl1wUAdcAd41uDUq5NVokEYkrK8/ERMSQcsWAKwgJJwrpPnFLSBP+K6XG/FzSQIpUzBX6SlEfaHMgJ3Sq6tEfaAwMlo2+TyIwInr5BfUFazQ4JHcmBHgIrNEIYcYsvIeFgrhZFcSsCLkAFTUKuVnKwJi4VEngIWECjWYkTRvBn+XSkPQRGN2RWZdsGZsQqehtI+QChChChuJ2EEGcNOuiPCqCfk9vhWCAroRq9k+Ya1jfC0aB786oL5SoH9yc/qRhVJ+MumchzRJaqX26HlK+Vz1kdCrLKl7r4Yuqh+eSNu8L5Sq4E/AfrX1DWPArwqPX0vda+l5L30sqfTt3pO8seGZxy4+R6yPi46kx3nVonFPGbtSSkYvUrJOpYHQ2pow9tubtGd/mPJtEAyYNWa1a7CmchBKyRiSF+ouq6CaChPjYxiULYWr4smlFiUh9bGGza7tT5XH5ay7KVT7IM19DmXygLsUsH+dY9QMzoWu7JXdb2t+tEhxt+lAynOPnkmHnjAfSYXt76tgyb9+lI28ppZl+OKQcAQ99bHfauTqUBsDITKdpKcnX6fzycjyNYEZWSW7vF1XbOXR2dP95chR09Jzn0nGILC8KcfcVUr8enjrNrV1pnlWamqKhaXltJWEc3fu457U9jAJIfDxnoDAK4mTm41QXWGAh93GgZHmZ1Bah/YNfCv2WiJYCb9UN2xr2LeUuo01kqoaQRjlxNqocXcZrQtX2XD0lTxur1lOrcLr2z6oiv6vJcDKfk0DVZnmhq2Q676nb78VCEXkTze7RlC3kNcx87ObLcUZT5eP2+kb62HNXK9WsLPU7U/l7i5oNLP/mhCURrOpqd/t+k9NVV8TG//Is1Eh+bC7F6Kli5/yLsWvYq19j97yxW+0dhBNnVglEADGRgPTm4GMhVSRCCUlEg7EUXNVJlEIhBkoHADH9Db2ODLkrFc61Pzl/xSyjYaSuaYgkDX2sIknIlVrF+/us2u3ax/psA1sZqeyQ1VjoCCU14ZmSO8ImejPv6GnCKFoXp+q+a+C3JGyp2dxbp+H4f3sWdfc9ix7i8GNIcA95hnObznCFB7Hec6k98MN8e89pa3tP+DCfgIqQ/uPjgMqAEVyRr5/XJ+KaBAptXnwg5ePfuqutfdM49bHdrarStrWJn+UE/JiSNWJqp+hlvh4p5NqWg2011w4h5AlyzatJtZr1vV+m6ba6epEdTuPCW1DdUPllm34Cmn4jgRqSOSyYSlurVvKgJAzWv725SFXr7GjDcHb0N1BLAwQUAAAACACTfnldAmKP4BgDAACRCwAAGAAAAHhsL3dvcmtzaGVldHMvc2hlZXQxLnhtbI2W226jMBCGX8VypFyWmIQmbQCph+1he9hs03bVS5cMiVWDWdtp2j79ymCiLsWkNwHDfP/M+A8jhxshX9QKQKO3jOcqwiuti0PPU8kKMqr2RAH5W8ZTITOq1Z6QS08VEuiihDLu+YPBvpdRluM4LJ/NZByKteYsh5lEap1lVL4fAxebCBNcP7hjy5U2D7w4LOgS5qAfipn04tDbqixYBrliIkcS0ggfkcOHMr4MeGSwUZ/ukenkWYgXs7hcRHiAjXIO6H1ecFbmQloU15DqE+A8wkc+RjTR7BVmNIcIPwutRWbeY6Q01RDhVIoPyMucwCHRppbiS3AlYkVNi39tvXjbjinq831d+Vm5rzOJnqmCE8H/sIVeRXiC0QJSuub6TmwuwO5VYPQSwVX5izZV7D5GyVppkVmWYJSxvLrSN7vFn+JHAwfgW8BvAP7EAQwtMGwCIwcwssCoARAXEFggaGZw9bBvgf1mhqEDGFtg3ADGjviJjZ80K3LZcGCBg2ZFrhbMi8q4QTOH70K2XjfNNm/akdpt0rTbuVWk9ps0DSeBC6kdJ18sd/2pSO05aZruLqx2nXzbdlL7TprGuze5tp5823tSm0+a7js/Eb9232+67/5ua/f9auBUE6IcL6dU0ziUYoOkiY/DxNyUM6qahxFmuZnUcy1xHDIVhzq+FaGn49AzKy+xzHE3c0z7vWFAprzfGw6C6UuLwkm3whP9oLIFO92FvVcps6S6tkj8+K4EegLJWgTOugUu58e3LdT5ri1Tddp7KtmqLfHFTokXZ9eX3ewV1bAUre3+7CZPGW+Brrqhfo8cHEzhlckM8hb8uhuf0/eUonntlHJ2fbOra6ug3Zt+2y1x3u/5gT/NE+AcMnDr/OrWeQTJOOToilWfTpvE7BsSFnfX8XuXM8PBaEoXHZ3cdSucCS36PX8ynkqatuDzbvwop6jj33i/g+a6i37YQfd7/pBM7dTiNKP/a3hSbM9t1TA1h9UbKpcsV4hDqiM82BsHGMnqkFYttCjKnNUpsbxdAV2ANAEBRqkQul6Ykb09hcf/AFBLAwQUAAAACACTfnldJQHZ2ogCAADZCgAADQAAAHhsL3N0eWxlcy54bWzdVtuOmzAQ/RXkD1hI6KJQAQ9FXalSW620+9BXEwyx5Au1zSrp11eDCSRZz2q7jwUl2HN8zoxnxoLCupNgTwfGXHSUQtmSHJwbPsex3R+YpPZOD0wdpei0kdTZO2362A6G0dYCSYp4myRZLClXpCrUKB+ks9Fej8qVJCFxVXRarZYt8YaqUFSy6IWKktRU8MbwaS2VXJy8eQuGvRbaRO7AJCvJBiz2j4c3fgZRzjqSK23AGHsP/r+Zl69qpm9KkiQP03WxfnrYqui4EEvAKfGGqhioc8yoBy7ExJmMr6BoHj+fBlaS3tDTZntP3k2wWvAWXPb1ZaxJcv/pazrJXFAX0elhq6LRpmVmiX1DzqaqEKxzcVUY3h/g6fQQA+iclnFVtJz2WtFpY2fGPLBVsWdCPEGf/OqutI9d5Av+rYVaR5C/85ALMQ+9jJ+A/qWa176Q3X5INhr4i3ZfRue0mua/R+3Yo2EdP07zY7f4x9Q3q/r24+rxvJ+LpF2lbLFG0P8l+QnHSqwSUTNy4biaZwfetky9ypytCkcbwa71ExK1rKOjcM8LWJJ1/IO1fJT5suoRtjWvWsffoUM22XJcbFVw1bIja+t5avrmpjnhAsItsh6x1wjG8VgYAQzzg0WAcTwL8/M/7WeH7sdjWGy7ILJDOTuU41khpJ5uzE+Yk+d5Ht5pnqdplmEZretgBDWWtyyDX1gNiw0YmB/w9G+5xquNd8jbfYDV9K0OwXaKdyK2UzzXgITzBow8D1cb8wMMrApY74D/sB/oqTAnTaGqWGzYCcaRPMcQ6MVwj2YZkp0M7nB9sFOSpnkeRgALR5CmGAKnEUewCCAGDEn9J9DN+yg+v6fi9WO2+gtQSwMEFAAAAAgAk355XZeKuxzAAAAAEwIAAAsAAABfcmVscy8ucmVsc53SS2oDMQyA4asM3neUptBFyGTVTXal5AKqrXkwtiVklbq3D8kmmdAX2YufT0LbN4poE+cyTlKammIunRvNZANQ/EgJS8tCuabYsya00rIOIOhnHAjWq9Uz6HXD7bbXzebwJfSfIvf95OmF/UeibN+EbyZcc0AdyDpXI3yyzu/Mc1tTdM0+dE734dHBnZaft4NEhgENwbPSgygLqU1ULpzA/lVZynliAVrfDfr7OFSNcqDwOwlFFqKnkwgWP7A7AlBLAwQUAAAACACTfnldOmoOBDYBAAAhAgAADwAAAHhsL3dvcmtib29rLnhtbI1R0WrDMAz8leAPqNOyFVaSvKxsK4ytrKXviqM0orYVbKXt+vUjCWGFvexJvpM57k7ZhcOpZD4lV2d9zFUj0q60jqZBB3HGLfqrszUHBxJnHI46tgGhig2iOKsXabrUDsirIpu0tkHfAxY0Qux1kfXEgfASf/c9TM4UqSRL8p2r4W1RJY48ObphlatUJbHhyxsHurEXsDsT2NpczcfFAYOQ+UPvepN7KOPACJRfIMS5WqapSmoKUYYfgz4YoTPuoRxRJ/xCVjCsQfA1cNeSP/Yyusj0XYyhh2mOJa7Cf2rkuiaDazadQy9jjwFtb9DHhtqoEg8Oc7UGgT4OomyqMZqA4F1RYUVVrsKmGt1NliqsyWP1AQ6jLjID1mxD0o9BZ/HwOH9SSd1Z+wzWfPp3hmpKOF2n+AFQSwMEFAAAAAgAk355XSQem6KsAAAA+AEAABoAAAB4bC9fcmVscy93b3JrYm9vay54bWwucmVsc7WRvQqDQBCEX+W4B3DVQIqgVmnSBl/g0NUT74/bDdG3D9FChRRprJaZ4pthp3iiUTx4R3oIJCZrHJVSM4cbADUaraLEB3STNZ2PVjElPvYQVDOqHiFP0yvEPUNWxZ4p6jngP0TfdUODd9+8LDr+AYa3jyNpRJaiVrFHLiVMZrMJlpMlkzVSPNpSxkebSTitEPFskLY2qz7E5yfGs0aLW/oiV/P4gsu3AxyGrj5QSwMEFAAAAAgAk355XWWQeZIZAQAAzwMAABMAAABbQ29udGVudF9UeXBlc10ueG1srZPPTsMwDMZfpcp1ajw4cEDrLsAVduAFQuKu0ZI4ir3RvT1q90cCjWpoXOJD7O9n+0sW7/uMXPUxJG5UJ5IfAdh2GA1rypj6GFoq0QhrKmvIxm7MGuF+Pn8AS0kwSS2DhlounrE12yDVSy+Y2FNqVMHAqno6JA6sRpmcg7dGPCXYJfeDUh8JumAYc7jzmWd9DAouEoab3wHHurcdluIdVitT5NVEbBT0AVj2AVlPS1zokdrWW3RktxGTaM4FjeMOUWLQB9HZNFk6jHg4727mjzJTQEd2VSgzWCr4d9zJkqG6zoUyFvHTI56JJueb58PBbYfuSnYf4JPKZvSDYQy37/i7x2f9K/r4INr89xMboo7GpxMfxn+8/AJQSwECFAMUAAAACACTfnldRsdNSJcAAADNAAAAEAAAAAAAAAAAAAAAgAEAAAAAZG9jUHJvcHMvYXBwLnhtbFBLAQIUAxQAAAAIAJN+eV3RWAro7wAAACsCAAARAAAAAAAAAAAAAACAAcUAAABkb2NQcm9wcy9jb3JlLnhtbFBLAQIUAxQAAAAIAJN+eV2ZXJwjDwYAAJwnAAATAAAAAAAAAAAAAACAAeMBAAB4bC90aGVtZS90aGVtZTEueG1sUEsBAhQDFAAAAAgAk355XQJij+AYAwAAkQsAABgAAAAAAAAAAAAAAICBIwgAAHhsL3dvcmtzaGVldHMvc2hlZXQxLnhtbFBLAQIUAxQAAAAIAJN+eV0lAdnaiAIAANkKAAANAAAAAAAAAAAAAACAAXELAAB4bC9zdHlsZXMueG1sUEsBAhQDFAAAAAgAk355XZeKuxzAAAAAEwIAAAsAAAAAAAAAAAAAAIABJA4AAF9yZWxzLy5yZWxzUEsBAhQDFAAAAAgAk355XTpqDgQ2AQAAIQIAAA8AAAAAAAAAAAAAAIABDQ8AAHhsL3dvcmtib29rLnhtbFBLAQIUAxQAAAAIAJN+eV0kHpuirAAAAPgBAAAaAAAAAAAAAAAAAACAAXAQAAB4bC9fcmVscy93b3JrYm9vay54bWwucmVsc1BLAQIUAxQAAAAIAJN+eV1lkHmSGQEAAM8DAAATAAAAAAAAAAAAAACAAVQRAABbQ29udGVudF9UeXBlc10ueG1sUEsFBgAAAAAJAAkAPgIAAJ4SAAAAAA==';
+const TEMPLATE_FILE_NAME = 'Kitap_Listesi.xlsx';
+const PHOTO_FOLDER_NAME = 'Fotoğraf';
+const EXCEL_HEADERS = ['No','Başlık','Yazar','Yayımcı','Yayım Yeri','ISBN','Basım Tarihi','Baskı','Kategori','Dil','Çevirmen','Sayfa Sayısı','Kayıt Tarihi','Güncelleme Tarihi','Verilen Kişi','Veriliş Tarihi','İade Tarihi','Fotoğraf','Ana Kategori','Alt Kategori','Açıklama'];
+
+let pickerStack = [];   // [{id, name, path}] — OneDrive kökünden geçerli klasöre
+let pickerBusy = false;
+
+function escH(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function isFirstRun(){
+  return !localStorage.getItem('kys4_setupDone') && !localStorage.getItem('kys4') && !localStorage.getItem('od_fileId');
+}
+function showWelcome(){ document.getElementById('welcomeModal').style.display = 'flex'; }
+function closeWelcome(){ document.getElementById('welcomeModal').style.display = 'none'; }
+function welcomeConnect(){ closeWelcome(); loginOneDrive(); }
+
+async function changeExcelFile(){
+  closeCfg();
+  if (!odAccount) { await loginOneDrive(); if (!odAccount) return; }
+  openPicker();
+}
+
+function openPicker(){
+  pickerStack = [{ id: 'root', name: 'OneDrive', path: '' }];
+  document.getElementById('pickerModal').style.display = 'flex';
+  pickerLoad();
+}
+function closePicker(){
+  document.getElementById('pickerModal').style.display = 'none';
+  if (!odFileId) setOdStatus('📁 Excel dosyası seçilmedi — Ayarlar → "OneDrive\'dan seç…" ile seçebilirsiniz', 'warn');
+}
+function pickerUp(){ if (pickerStack.length > 1) { pickerStack.pop(); pickerLoad(); } }
+function pickerGoTo(i){ pickerStack = pickerStack.slice(0, i + 1); pickerLoad(); }
+function pickerOpenFolder(id, name){
+  const cur = pickerStack[pickerStack.length - 1];
+  pickerStack.push({ id, name, path: (cur.path ? cur.path + '/' : '') + name });
+  pickerLoad();
+}
+function pickerMsg(html){ document.getElementById('pickerList').innerHTML = '<div style="padding:10px;color:#555">' + html + '</div>'; }
+
+async function pickerLoad(){
+  const cur = pickerStack[pickerStack.length - 1];
+  document.getElementById('pickerCrumb').innerHTML = pickerStack.map((f, i) =>
+    i === pickerStack.length - 1 ? '<b>' + escH(f.name) + '</b>'
+      : '<a href="#" onclick="pickerGoTo(' + i + ');return false" style="color:#0054e3">' + escH(f.name) + '</a>'
+  ).join(' › ');
+  document.getElementById('pickerUpBtn').disabled = pickerStack.length <= 1;
+  pickerMsg('🔄 Yükleniyor...');
+  try {
+    const t = await getToken();
+    let url = (cur.id === 'root' ? `${GRAPH}/me/drive/root/children` : `${GRAPH}/me/drive/items/${cur.id}/children`) + '?$select=id,name,folder,file&$top=200';
+    let items = [];
+    while (url) {
+      const r = await fetch(url, { headers: { Authorization: `Bearer ${t}` }});
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error?.message || r.status);
+      items = items.concat(d.value || []);
+      url = d['@odata.nextLink'] || null;
+    }
+    const folders = items.filter(i => i.folder).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    const files = items.filter(i => i.file && /\.xlsx$/i.test(i.name)).sort((a, b) => a.name.localeCompare(b.name, 'tr'));
+    if (!folders.length && !files.length) { pickerMsg('Bu klasör boş. Aşağıdaki düğmeyle buraya yeni boş liste oluşturabilirsiniz.'); return; }
+    const row = 'padding:5px 8px;border-bottom:1px solid #eee;cursor:pointer;display:flex;gap:6px;align-items:center';
+    document.getElementById('pickerList').innerHTML =
+      folders.map(f => '<div style="' + row + '" onmouseover="this.style.background=\'#e8f0fe\'" onmouseout="this.style.background=\'\'" onclick="pickerOpenFolder(\'' + escH(f.id) + '\',' + escH(JSON.stringify(f.name)) + ')">📁 ' + escH(f.name) + '</div>').join('') +
+      files.map(f => '<div style="' + row + ';font-weight:bold" onmouseover="this.style.background=\'#e8f0fe\'" onmouseout="this.style.background=\'\'" onclick="pickerChooseFile(\'' + escH(f.id) + '\',' + escH(JSON.stringify(f.name)) + ')">📗 ' + escH(f.name) + ' <span style="font-weight:normal;color:#0054e3;margin-left:auto">← bunu kullan</span></div>').join('');
+  } catch(e) {
+    pickerMsg('❌ Klasör okunamadı: ' + escH(e.message || e));
+  }
+}
+
+async function pickerChooseFile(fileId, fileName){
+  if (pickerBusy) return;
+  const cur = pickerStack[pickerStack.length - 1];
+  await finishSetup(fileId, fileName, cur);
+}
+
+async function pickerCreateNew(){
+  if (pickerBusy) return;
+  const cur = pickerStack[pickerStack.length - 1];
+  pickerBusy = true;
+  pickerMsg('🔄 Boş kitap listesi oluşturuluyor...');
+  try {
+    const t = await getToken();
+    const bin = atob(TEMPLATE_XLSX_B64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const target = cur.id === 'root' ? `${GRAPH}/me/drive/root:/` : `${GRAPH}/me/drive/items/${cur.id}:/`;
+    const r = await fetch(target + encodeURIComponent(TEMPLATE_FILE_NAME) + ':/content?@microsoft.graph.conflictBehavior=rename', {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+      body: bytes
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || r.status);
+    pickerBusy = false;
+    await finishSetup(d.id, d.name, cur);
+  } catch(e) {
+    pickerBusy = false;
+    pickerMsg('❌ Dosya oluşturulamadı: ' + escH(e.message || e));
+  }
+}
+
+async function finishSetup(fileId, fileName, folder){
+  pickerBusy = true;
+  pickerMsg('🔄 Kuruluyor: Excel sayfası ve fotoğraf klasörü hazırlanıyor...');
+  try {
+    const t = await getToken();
+    odFileId = fileId;
+    OD_FILE_NAME = fileName;
+    OD_SHEET = localStorage.getItem('od_sheet') || 'Data';
+    await ensureSheetAndHeaders(t);
+    // Fotoğraf klasörü: Excel'in bulunduğu klasörün içinde
+    const fid = await ensureFolder(folder.id, PHOTO_FOLDER_NAME, t);
+    OD_PHOTOS_PATH = (folder.path ? folder.path + '/' : '') + PHOTO_FOLDER_NAME;
+    localStorage.setItem('od_fileId', odFileId);
+    localStorage.setItem('od_fileName', OD_FILE_NAME);
+    localStorage.setItem('od_sheet', OD_SHEET);
+    if (fid) localStorage.setItem('od_photosPath', OD_PHOTOS_PATH);
+    localStorage.setItem('kys4_setupDone', '1');
+    pickerBusy = false;
+    document.getElementById('pickerModal').style.display = 'none';
+    await readFromExcel(t);
+    await loadPhotoIndex(t);
+    setOdUI(true);
+  } catch(e) {
+    pickerBusy = false;
+    odFileId = null;
+    pickerMsg('❌ Kurulum tamamlanamadı: ' + escH(e.message || e) + '<br><br><a href="#" onclick="pickerLoad();return false">Klasöre geri dön</a>');
+  }
+}
+
+// Data sayfası yoksa ekler, boşsa başlık satırını yazar
+async function ensureSheetAndHeaders(t){
+  const H = { Authorization: `Bearer ${t}` };
+  const base = `${GRAPH}/me/drive/items/${odFileId}/workbook/worksheets`;
+  let r, d;
+  for (let i = 0; i < 4; i++) {   // yeni yüklenen dosyada Excel servisi birkaç saniye gecikebilir
+    r = await fetch(base, { headers: H });
+    d = await r.json().catch(() => ({}));
+    if (r.ok) break;
+    await new Promise(res => setTimeout(res, 1500));
+  }
+  if (!r.ok) throw new Error(d.error?.message || ('Excel açılamadı (' + r.status + ')'));
+  const names = (d.value || []).map(w => w.name);
+  if (!names.some(n => n.toLowerCase() === OD_SHEET.toLowerCase())) {
+    const a = await fetch(base + '/add', { method: 'POST', headers: { ...H, 'Content-Type': 'application/json' }, body: JSON.stringify({ name: OD_SHEET }) });
+    if (!a.ok) { const e = await a.json().catch(() => ({})); throw new Error(e.error?.message || ('"' + OD_SHEET + '" sayfası eklenemedi')); }
+  } else {
+    OD_SHEET = names.find(n => n.toLowerCase() === OD_SHEET.toLowerCase());
+  }
+  const sh = `${base}/${encodeURIComponent(OD_SHEET)}`;
+  const u = await fetch(`${sh}/usedRange(valuesOnly=true)`, { headers: H });
+  const ud = await u.json().catch(() => ({}));
+  const first = (ud.values && ud.values[0]) || [];
+  if (!first.some(v => v !== '' && v != null)) {
+    await fetch(`${sh}/range(address='A1:U1')`, {
+      method: 'PATCH', headers: { ...H, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [EXCEL_HEADERS] })
+    });
+  }
+}
+
+// Klasör yoksa oluşturur, kimliğini döndürür
+async function ensureFolder(parentId, name, t){
+  const base = parentId === 'root' ? `${GRAPH}/me/drive/root/children` : `${GRAPH}/me/drive/items/${parentId}/children`;
+  const r = await fetch(base, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, folder: {}, '@microsoft.graph.conflictBehavior': 'fail' })
+  });
+  if (r.ok) return (await r.json()).id;
+  if (r.status === 409) {
+    const l = await fetch(base + '?$select=id,name,folder&$top=999', { headers: { Authorization: `Bearer ${t}` }});
+    const d = await l.json();
+    const f = (d.value || []).find(i => i.folder && i.name === name);
+    return f ? f.id : null;
+  }
+  return null;
 }
 
 function logoutOneDrive() {
@@ -986,6 +1229,7 @@ function init(){
  rebuildAltKatSelect('');
  doSearch();
  setStatus('Hazır — '+books.length+' kitap yüklendi. '+(pendingQueue.length?'['+pendingQueue.length+' bekleyen işlem]':''));
+ if (isFirstRun()) showWelcome();
  initMsal();
 }
 function doSearch(){
